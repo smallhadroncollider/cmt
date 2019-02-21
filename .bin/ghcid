@@ -1,0 +1,1 @@
+~/.local/bin/ghcid --command "stack ghci cmt:lib cmt:test:cmt-test --ghci-options=-fobject-code" --test "main"

@@ -1,0 +1,54 @@
+name:                cmt
+version:             0.1.0.0
+github:              "smallhadroncollider/cmt"
+license:             BSD3
+author:              "Small Hadron Collider / Mark Wales"
+maintainer:          "mark@smallhadroncollider.com"
+copyright:           "Small Hadron Collider / Mark Wales"
+
+extra-source-files:
+- README.md
+
+synopsis:            Write consistent git commit messages
+category:            Command Line Tools
+description:         Please see the README on GitHub at <https://github.com/smallhadroncollider/cmt#readme>
+
+default-extensions:
+- OverloadedStrings
+- NoImplicitPrelude
+
+dependencies:
+- base >= 4.7 && < 5
+- classy-prelude
+
+library:
+  source-dirs: src
+  dependencies:
+  - attoparsec
+  - text
+
+executables:
+  cmt:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - cmt
+
+tests:
+  cmt-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - cmt
+    - tasty
+    - tasty-discover
+    - tasty-hunit
+    - tasty-expected-failure
