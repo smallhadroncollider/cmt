@@ -22,7 +22,7 @@ formatNamedP :: [Name] -> Parser FormatPart
 formatNamedP names = Named <$> (string "${" *> valid names <* char '}')
 
 formatLiteralP :: Parser FormatPart
-formatLiteralP = Literal <$> (pack <$> many1 (notChar '$'))
+formatLiteralP = Literal <$> (singleton <$> anyChar)
 
 formatP :: [Name] -> Parser Format
 formatP names = lexeme $ many1 (formatNamedP names <|> formatLiteralP)
