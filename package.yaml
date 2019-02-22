@@ -26,6 +26,8 @@ library:
   dependencies:
   - attoparsec
   - text
+  - directory
+  - process
 
 executables:
   cmt:

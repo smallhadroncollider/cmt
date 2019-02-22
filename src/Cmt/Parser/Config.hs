@@ -9,7 +9,7 @@ import ClassyPrelude
 
 import Data.Attoparsec.Text
 
-import Cmt.Parser.Attoparsec (chopt, lexeme)
+import Cmt.Parser.Attoparsec (chopt, lexeme, tnotChar)
 import Cmt.Types.Config
 
 word :: Parser Text
@@ -35,7 +35,7 @@ linesP :: Parser PartType
 linesP = string "!@" $> Lines
 
 listItemP :: Parser Text
-listItemP = lexeme $ char '"' *> word <* char '"' <* chopt ','
+listItemP = lexeme $ char '"' *> tnotChar '"' <* char '"' <* chopt ','
 
 listP :: Parser PartType
 listP = Options <$> (char '[' *> many' listItemP <* char ']')
