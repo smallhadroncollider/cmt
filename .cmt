@@ -14,4 +14,5 @@
 }
 
 ${Type} (${Scope}): ${Short Message}
+
 ${Body}
