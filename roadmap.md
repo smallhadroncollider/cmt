@@ -7,6 +7,9 @@
     > Automatically adds a hyphen to each entry?
 - ${*} name - from CLI argument
     > Wildcard name would accept whatever is passed in on command line: e.g. cmt "blah blah" - the "blah blah" goes in ${*} place
+- Show options in flat list if short?
+- Should search up directories to find .cmt
+- Should support ~/.cmt for global option
 
 ## Done
 
