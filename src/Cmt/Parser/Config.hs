@@ -16,7 +16,7 @@ word :: Parser Text
 word = pack <$> many1 (letter <|> space)
 
 valid :: [Name] -> Parser Text
-valid names = choice $ string <$> names
+valid names = choice $ "*" : (string <$> names)
 
 formatNamedP :: [Name] -> Parser FormatPart
 formatNamedP names = Named <$> (string "${" *> valid names <* char '}')
