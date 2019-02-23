@@ -18,9 +18,12 @@ checkFormat :: [Output] -> Config -> Either Text (Config, [Output])
 checkFormat output (Config parts format) = do
     let partNames = nub $ partName <$> parts
     let formatNames = nub . catMaybes $ formatName <$> format
-    if (length partNames + length output) /= length formatNames
-        then Left "Parts and format do not match"
-        else Right (Config parts format, output)
+    let result
+            | isJust (find (== "*") formatNames) && null output = Left "Command line entry missing"
+            | (length partNames + length output) /= length formatNames =
+                Left "Parts and format do not match"
+            | otherwise = Right (Config parts format, output)
+    result
 
 parse :: [Output] -> Text -> Either Text (Config, [Output])
 parse output cfg = config cfg >>= checkFormat output
