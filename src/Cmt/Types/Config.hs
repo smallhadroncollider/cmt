@@ -4,6 +4,8 @@ module Cmt.Types.Config where
 
 import ClassyPrelude (Maybe (..), Show, Text)
 
+type Output = (Name, Text)
+
 type Name = Text
 
 data FormatPart

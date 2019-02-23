@@ -12,6 +12,16 @@ stack build && stack install
 
 Add a `.cmt` file to your project directory.
 
+```bash
+cmt # will show the options and then commit
+```
+
+If you're using the `${*}` format option then:
+
+```bash
+cmt "blah blah blah" # this will go in ${*} place
+```
+
 ### Format
 
 A `.cmt` file consist of two parts: the input parts and the output format.
@@ -54,3 +64,21 @@ These are at the top of the `.cmt` file and surrounded by opening and closing cu
 #### Output Format
 
 The output format consists of named input parts plus anything else you want.
+
+You can accept a output called `${*}`, which will add in whatever is passed to `cmt` as command line arguments.
+
+For example:
+
+```txt
+{
+    "Scope" = @
+}
+
+(${Scope}): ${*}
+```
+
+Then use with:
+
+```bash
+cmt "Blah blah blah"
+```

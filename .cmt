@@ -9,10 +9,9 @@
         "chore"
     ]
     "Scope" = @
-    "Short Message" = @
     "Body" = !@
 }
 
-${Type} (${Scope}): ${Short Message}
+${Type} (${Scope}): ${*}
 
 ${Body}
