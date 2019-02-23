@@ -1,14 +1,22 @@
 ## Bugs
 
-- Shouldn't be able to add blank Line
 
 ## Features
 
+- Better error message for * missing
+    > If ${*} detected, then say if no command line argument given
 - List option?
     > Automatically adds a hyphen to each entry?
 - Show options in flat list if short?
 - Should search up directories to find .cmt
 - Should support ~/.cmt for global option
+- Make parts optional
+    > @? and !@? operators?
+- Store previous commit info if it fails
+    > Store if commit fails. `cmt --prev` option?
+
+## Doing
+
 
 ## Done
 
@@ -18,3 +26,4 @@
     > List items can only contain letters and spaces
 - ${*} name - from CLI argument
     > Wildcard name would accept whatever is passed in on command line: e.g. cmt "blah blah" - the "blah blah" goes in ${*} place
+- Shouldn't be able to add blank Line

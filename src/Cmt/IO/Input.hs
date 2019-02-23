@@ -23,7 +23,9 @@ output :: Part -> IO (Name, Text)
 output (Part name Line) = do
     putStrLn $ name <> ":"
     val <- getLine
-    pure (name, val)
+    if null val
+        then output (Part name Line)
+        else pure (name, val)
 output (Part name (Options opts)) = do
     let opts' = zip [1 ..] opts
     putStrLn $ name <> ":"
