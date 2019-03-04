@@ -27,6 +27,7 @@ library:
   - attoparsec
   - text
   - directory
+  - filepath
   - process
 
 executables:
