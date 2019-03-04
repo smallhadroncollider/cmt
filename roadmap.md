@@ -7,10 +7,12 @@
     > Store if commit fails. `cmt --prev` option?
 - List option?
     > Automatically adds a hyphen to each entry?
+- Add comments to .cmt
 - Show options in flat list if short?
 - Make parts optional
     > @? and !@? operators?
-- Should search up directories to find .cmt
+- Option to show files that have changed
+    > Useful for things like ${Scope} - autocomplete maybe?
 - Should support ~/.cmt for global option
 
 ## Doing
@@ -27,3 +29,4 @@
 - Shouldn't be able to add blank Line
 - Better error message for * missing
     > If ${*} detected, then say if no command line argument given
+- Should search up directories to find .cmt
