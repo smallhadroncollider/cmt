@@ -1,5 +1,7 @@
 ## Bugs
 
+- pre-commit errors don't get displayed at all
+    > Probably need to show stderr in some cases?
 
 ## Features
 
@@ -13,7 +15,6 @@
     > @? and !@? operators?
 - Option to show files that have changed
     > Useful for things like ${Scope} - autocomplete maybe?
-- Should support ~/.cmt for global option
 
 ## Doing
 
@@ -30,3 +31,4 @@
 - Better error message for * missing
     > If ${*} detected, then say if no command line argument given
 - Should search up directories to find .cmt
+- Should support ~/.cmt for global option

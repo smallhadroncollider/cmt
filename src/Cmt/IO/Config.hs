@@ -6,7 +6,7 @@ module Cmt.IO.Config where
 import ClassyPrelude
 
 import Data.List        (nub)
-import System.Directory (doesFileExist, getCurrentDirectory)
+import System.Directory (doesFileExist, getCurrentDirectory, getHomeDirectory)
 import System.FilePath  (takeDirectory, (</>))
 
 import Cmt.Parser.Config (config)
@@ -37,24 +37,41 @@ parseArgs []    = []
 parseArgs [msg] = [("*", msg)]
 parseArgs parts = [("*", unwords parts)]
 
-parentDir :: FilePath -> IO (Maybe FilePath)
-parentDir path = do
+checkParent :: FilePath -> IO (Maybe FilePath)
+checkParent path = do
     let parent = takeDirectory path
     if parent /= path
-        then findFile parent
+        then checkDir parent
         else pure Nothing
 
-findFile :: FilePath -> IO (Maybe FilePath)
-findFile path = do
+checkDir :: FilePath -> IO (Maybe FilePath)
+checkDir path = do
     let fp = path </> configFile
     exists <- doesFileExist fp
     if exists
         then pure $ Just fp
-        else parentDir path
+        else checkParent path
+
+homeDir :: IO (Maybe FilePath)
+homeDir = do
+    home <- getHomeDirectory
+    let fp = home </> configFile
+    exists <- doesFileExist fp
+    pure $
+        if exists
+            then Just fp
+            else Nothing
+
+findFile :: IO (Maybe FilePath)
+findFile = do
+    inDir <- checkDir =<< getCurrentDirectory
+    case inDir of
+        Just fp -> pure $ Just fp
+        Nothing -> homeDir
 
 load :: IO (Either Text (Config, [Output]))
 load = do
-    exists <- findFile =<< getCurrentDirectory
+    exists <- findFile
     case exists of
         Just path -> do
             output <- parseArgs <$> getArgs
