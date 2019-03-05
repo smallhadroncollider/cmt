@@ -7,7 +7,7 @@ import ClassyPrelude
 
 import Data.List        (nub)
 import System.Directory (doesFileExist, getCurrentDirectory)
-import System.FilePath  (takeDirectory)
+import System.FilePath  (takeDirectory, (</>))
 
 import Cmt.Parser.Config (config)
 import Cmt.Types.Config
@@ -46,7 +46,7 @@ parentDir path = do
 
 findFile :: FilePath -> IO (Maybe FilePath)
 findFile path = do
-    let fp = path <> "/" <> configFile
+    let fp = path </> configFile
     exists <- doesFileExist fp
     if exists
         then pure $ Just fp
