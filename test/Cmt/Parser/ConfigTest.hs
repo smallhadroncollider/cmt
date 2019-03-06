@@ -18,8 +18,7 @@ basic :: Text
 basic = decodeUtf8 $(embedFile "test/data/.cmt")
 
 basicConfig :: Config
-basicConfig =
-    Config [Part "Week" Line] [Named "Week", Literal ":", Literal " ", Named "*", Literal "\n"]
+basicConfig = Config [Part "Week" Line] [Named "Week", Literal ": ", Named "*", Literal "\n"]
 
 angular :: Text
 angular = decodeUtf8 $(embedFile "test/data/.cmt-angular")
@@ -36,15 +35,11 @@ angularConfig =
         , Part "Body" Lines
         ]
         [ Named "Type"
-        , Literal " "
-        , Literal "("
+        , Literal " ("
         , Named "Scope"
-        , Literal ")"
-        , Literal ":"
-        , Literal " "
+        , Literal "): "
         , Named "Short Message"
-        , Literal "\n"
-        , Literal "\n"
+        , Literal "\n\n"
         , Named "Body"
         , Literal "\n"
         ]

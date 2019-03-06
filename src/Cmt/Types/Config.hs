@@ -13,8 +13,6 @@ data FormatPart
     | Literal Text
     deriving (Show, Eq)
 
-type Format = [FormatPart]
-
 data PartType
     = Options [Text]
     | Line
@@ -28,7 +26,7 @@ data Part =
 
 data Config =
     Config [Part]
-           Format
+           [FormatPart]
     deriving (Show, Eq)
 
 partName :: Part -> Name
