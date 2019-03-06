@@ -1,5 +1,5 @@
 name:                cmt
-version:             0.1.3.0
+version:             0.2.0.0
 github:              "smallhadroncollider/cmt"
 license:             BSD3
 author:              "Small Hadron Collider / Mark Wales"
@@ -51,6 +51,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - cmt
+    - file-embed
     - tasty
     - tasty-discover
     - tasty-hunit

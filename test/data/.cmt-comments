@@ -1,0 +1,28 @@
+# The input parts
+# Blah blah blah
+#
+# Blah blah blah
+
+# Blah blah blah
+{ # A comment
+    # A list of stuff
+    "Type" = [ # A list of options
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor", ## A comment here too
+        "test",
+        "chore"
+    ] # A comment
+    # The scope
+    "Scope" = @ # Another comment
+    "Short Message" = @ # All the comments all the time
+    "Body" = !@ # So many comments!
+} # Another comment
+
+# Blah blah blah
+# Blah blah blah
+${Type} (${Scope}): ${Short Message}
+
+${Body}

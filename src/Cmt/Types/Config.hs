@@ -2,7 +2,7 @@
 
 module Cmt.Types.Config where
 
-import ClassyPrelude (Maybe (..), Show, Text)
+import ClassyPrelude (Eq, Maybe (..), Show, Text)
 
 type Output = (Name, Text)
 
@@ -11,7 +11,7 @@ type Name = Text
 data FormatPart
     = Named Name
     | Literal Text
-    deriving (Show)
+    deriving (Show, Eq)
 
 type Format = [FormatPart]
 
@@ -19,17 +19,17 @@ data PartType
     = Options [Text]
     | Line
     | Lines
-    deriving (Show)
+    deriving (Show, Eq)
 
 data Part =
     Part Name
          PartType
-    deriving (Show)
+    deriving (Show, Eq)
 
 data Config =
     Config [Part]
            Format
-    deriving (Show)
+    deriving (Show, Eq)
 
 partName :: Part -> Name
 partName (Part name _) = name

@@ -29,7 +29,9 @@ A `.cmt` file consist of two parts: the input parts and the output format.
 For example, the [AngularJS Commit Message Guidelines](https://gist.github.com/stephenparish/9941e89d80e2bc58a153):
 
 ```txt
+# The input parts
 {
+    # Shows a list of options
     "Type" = [
         "feat",
         "fix",
@@ -39,12 +41,15 @@ For example, the [AngularJS Commit Message Guidelines](https://gist.github.com/s
         "test",
         "chore"
     ]
-    "Scope" = @
+    "Scope" = @ # Allows a single line of input
     "Subject" = @
-    "Body" = !@
+    "Body" = !@ # Allows multi-line input
     "Footer" = !@
 }
 
+# The output format
+# Takes the values provided from the input stage
+# and interpolates them in
 ${Type} (${Scope}): ${Subject}
 
 ${Body}
@@ -70,10 +75,13 @@ You can accept a output called `${*}`, which will add in whatever is passed to `
 For example:
 
 ```txt
+# Input parts
+# * input not needed, as comes from command-line
 {
     "Scope" = @
 }
 
+# Scope from input and * from command-line
 (${Scope}): ${*}
 ```
 
