@@ -1,8 +1,5 @@
 ## Bugs
 
-- pre-commit errors don't get displayed at all
-    > Probably need to show stderr in some cases?
-- Extra new-line at the end of the output
 
 ## Features
 
@@ -14,7 +11,7 @@
 - Make parts optional
     > @? and !@? operators?
 - Option to show files that have changed
-    > Useful for things like ${Scope} - autocomplete maybe?
+    > Useful for things like ${Scope} - autocomplete maybe? `git diff --name-only`
 
 ## Doing
 
@@ -33,3 +30,5 @@
 - Should search up directories to find .cmt
 - Should support ~/.cmt for global option
 - Add comments to .cmt
+- pre-commit errors don't get displayed at all
+    > Probably need to show stderr in some cases?

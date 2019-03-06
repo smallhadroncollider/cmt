@@ -12,5 +12,5 @@ import System.Process (readCreateProcessWithExitCode, shell)
 commit :: Text -> IO Text
 commit message = do
     let msg = "git commit -m '" <> unpack message <> "'"
-    (_, out, _) <- readCreateProcessWithExitCode (shell msg) ""
-    pure $ pack out
+    (_, out, err) <- readCreateProcessWithExitCode (shell msg) ""
+    pure $ unlines (pack <$> filter (not . null) [out, err])
