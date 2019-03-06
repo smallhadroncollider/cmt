@@ -2,11 +2,30 @@
 
 Write consistent git commit messages
 
-## Installation
+## Install
+
+[Binaries for Mac and Linux are available](https://github.com/smallhadroncollider/cmt/releases). Add the binary to a directory in your path (such as `/usr/local/bin`).
+
+### Cabal
+
+**Requirements**: [Cabal](https://www.haskell.org/cabal/)
+
+```bash
+cabal install cmt
+```
+
+Make sure you run `cabal update` if you haven't run it recently.
+
+### Building
+
+**Requirements**: [Stack](https://docs.haskellstack.org/en/stable/README/)
+
+The following command will build cmt and then install it in `~/.local/bin`:
 
 ```bash
 stack build && stack install
 ```
+
 
 ## Usage
 
