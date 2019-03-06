@@ -9,8 +9,26 @@ import ClassyPrelude
 
 import Data.Attoparsec.Text
 
-import Cmt.Parser.Attoparsec (chopt, lexeme, tnotChar)
 import Cmt.Types.Config
+
+-- useful bits
+lexeme :: Parser a -> Parser a
+lexeme p = skipSpace *> p <* skipSpace
+
+tchar :: Char -> Parser Text
+tchar ch = singleton <$> char ch
+
+chopt :: Char -> Parser Text
+chopt ch = option "" (tchar ch)
+
+tnotChar :: Char -> Parser Text
+tnotChar c = pack <$> many1 (notChar c)
+
+commentP :: Parser ()
+commentP = lexeme $ many' (char '#' *> many' (notChar '\n') *> char '\n') $> ()
+
+stripComments :: Parser a -> Parser a
+stripComments p = lexeme $ commentP *> p <* commentP
 
 word :: Parser Text
 word = pack <$> many1 (letter <|> space)
@@ -18,6 +36,7 @@ word = pack <$> many1 (letter <|> space)
 valid :: [Name] -> Parser Text
 valid names = choice $ "*" : (string <$> names)
 
+-- format parts
 formatNamedP :: [Name] -> Parser FormatPart
 formatNamedP names = Named <$> (string "${" *> valid names <* char '}')
 
@@ -25,9 +44,9 @@ formatLiteralP :: Parser FormatPart
 formatLiteralP = Literal <$> (singleton <$> anyChar)
 
 formatP :: [Name] -> Parser Format
-formatP names = lexeme $ many1 (formatNamedP names <|> formatLiteralP)
+formatP names = stripComments $ many1 (formatNamedP names <|> formatLiteralP)
 
--- part types
+-- input parts
 lineP :: Parser PartType
 lineP = char '@' $> Line
 
@@ -35,7 +54,7 @@ linesP :: Parser PartType
 linesP = string "!@" $> Lines
 
 listItemP :: Parser Text
-listItemP = lexeme $ char '"' *> tnotChar '"' <* char '"' <* chopt ','
+listItemP = stripComments $ char '"' *> tnotChar '"' <* char '"' <* chopt ','
 
 listP :: Parser PartType
 listP = Options <$> (char '[' *> many' listItemP <* char ']')
@@ -46,10 +65,10 @@ nameP = char '"' *> word <* char '"' <* lexeme (char '=')
 
 -- part
 partP :: Parser Part
-partP = lexeme $ Part <$> nameP <*> (listP <|> lineP <|> linesP)
+partP = stripComments $ Part <$> nameP <*> (listP <|> lineP <|> linesP)
 
 partsP :: Parser [Part]
-partsP = lexeme $ char '{' *> many' partP <* char '}'
+partsP = stripComments $ stripComments (char '{') *> many' partP <* stripComments (char '}')
 
 configP :: Parser Config
 configP = do

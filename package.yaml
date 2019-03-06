@@ -51,6 +51,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - cmt
+    - file-embed
     - tasty
     - tasty-discover
     - tasty-hunit

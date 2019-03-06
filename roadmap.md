@@ -2,15 +2,15 @@
 
 - pre-commit errors don't get displayed at all
     > Probably need to show stderr in some cases?
+- Extra new-line at the end of the output
 
 ## Features
 
+- Show options in flat list if short?
 - Store previous commit info if it fails
     > Store if commit fails. `cmt --prev` option?
 - List option?
     > Automatically adds a hyphen to each entry?
-- Add comments to .cmt
-- Show options in flat list if short?
 - Make parts optional
     > @? and !@? operators?
 - Option to show files that have changed
@@ -32,3 +32,4 @@
     > If ${*} detected, then say if no command line argument given
 - Should search up directories to find .cmt
 - Should support ~/.cmt for global option
+- Add comments to .cmt
