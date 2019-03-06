@@ -7,35 +7,53 @@ module Cmt.IO.Input
 
 import ClassyPrelude
 
+import System.Console.Terminal.Size (size, width)
+
 import Cmt.Types.Config
 
-listItem :: (Int, Text) -> IO ()
-listItem (n, o) = putStrLn $ tshow n <> ") " <> o
+prompt :: Text -> IO Text
+prompt s = do
+    putStr $ s <> " "
+    hFlush stdout
+    getLine
+
+getWidth :: IO Int
+getWidth = maybe 0 width <$> size
+
+putName :: Text -> IO ()
+putName name = putStrLn $ "\n" <> name <> ":"
+
+listItem :: (Int, Text) -> Text
+listItem (n, o) = tshow n <> ") " <> o
 
 multiLine :: [Text] -> IO [Text]
 multiLine input = do
-    value <- getLine
+    value <- prompt ">"
     if null value
         then pure input
         else multiLine $ input ++ [value]
 
 output :: Part -> IO (Name, Text)
 output (Part name Line) = do
-    putStrLn $ name <> ":"
-    val <- getLine
+    putName name
+    val <- prompt ">"
     if null val
         then output (Part name Line)
         else pure (name, val)
 output (Part name (Options opts)) = do
+    putName name
     let opts' = zip [1 ..] opts
-    putStrLn $ name <> ":"
-    sequence_ $ listItem <$> opts'
-    chosen <- getLine
+    let long = intercalate "   " $ listItem <$> opts'
+    maxLength <- getWidth
+    if length long < maxLength
+        then putStrLn long
+        else sequence_ $ putStrLn . listItem <$> opts'
+    chosen <- prompt ">"
     case find ((== chosen) . tshow . fst) opts' of
         Nothing     -> output (Part name (Options opts))
         Just (_, o) -> pure (name, o)
 output (Part name Lines) = do
-    putStrLn $ name <> ":"
+    putName name
     val <- unlines <$> multiLine []
     pure (name, val)
 

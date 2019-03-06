@@ -29,6 +29,7 @@ library:
   - directory
   - filepath
   - process
+  - terminal-size
 
 executables:
   cmt:

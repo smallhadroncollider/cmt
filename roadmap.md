@@ -3,7 +3,6 @@
 
 ## Features
 
-- Show options in flat list if short?
 - Store previous commit info if it fails
     > Store if commit fails. `cmt --prev` option?
 - List option?
@@ -32,3 +31,4 @@
 - Add comments to .cmt
 - pre-commit errors don't get displayed at all
     > Probably need to show stderr in some cases?
+- Show options in flat list if short?
