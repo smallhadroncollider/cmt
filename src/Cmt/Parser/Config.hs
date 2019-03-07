@@ -9,12 +9,10 @@ import ClassyPrelude
 
 import Data.Attoparsec.Text
 
+import Cmt.Parser.Attoparsec
 import Cmt.Types.Config
 
 -- useful bits
-lexeme :: Parser a -> Parser a
-lexeme p = skipSpace *> p <* skipSpace
-
 tchar :: Char -> Parser Text
 tchar ch = singleton <$> char ch
 
@@ -59,6 +57,9 @@ formatP :: [Name] -> Parser [FormatPart]
 formatP names = smoosh <$> stripComments (many1 (formatNamedP names <|> formatLiteralP))
 
 -- input parts
+changedP :: Parser PartType
+changedP = char '%' $> Changed
+
 lineP :: Parser PartType
 lineP = char '@' $> Line
 
@@ -77,7 +78,7 @@ nameP = char '"' *> word <* char '"' <* lexeme (char '=')
 
 -- part
 partP :: Parser Part
-partP = stripComments $ Part <$> nameP <*> (listP <|> lineP <|> linesP)
+partP = stripComments $ Part <$> nameP <*> (listP <|> lineP <|> linesP <|> changedP)
 
 partsP :: Parser [Part]
 partsP = stripComments $ stripComments (char '{') *> many' partP <* stripComments (char '}')

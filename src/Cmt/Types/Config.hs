@@ -17,6 +17,7 @@ data PartType
     = Options [Text]
     | Line
     | Lines
+    | Changed
     deriving (Show, Eq)
 
 data Part =

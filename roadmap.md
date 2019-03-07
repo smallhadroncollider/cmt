@@ -1,5 +1,6 @@
 ## Bugs
 
+- Multi-line is always optional
 
 ## Features
 
@@ -9,8 +10,6 @@
     > Automatically adds a hyphen to each entry?
 - Make parts optional
     > @? and !@? operators?
-- Option to show files that have changed
-    > Useful for things like ${Scope} - autocomplete maybe? `git diff --name-only`
 
 ## Doing
 
@@ -32,3 +31,5 @@
 - pre-commit errors don't get displayed at all
     > Probably need to show stderr in some cases?
 - Show options in flat list if short?
+- Option to show files that have changed
+    > Useful for things like ${Scope} - autocomplete maybe? `git diff --name-only`

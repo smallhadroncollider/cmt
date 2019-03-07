@@ -30,7 +30,7 @@ angularConfig :: Config
 angularConfig =
     Config
         [ Part "Type" (Options ["feat", "fix", "docs", "style", "refactor", "test", "chore"])
-        , Part "Scope" Line
+        , Part "Scope" Changed
         , Part "Short Message" Line
         , Part "Body" Lines
         ]

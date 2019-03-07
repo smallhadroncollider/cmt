@@ -16,7 +16,7 @@
         "chore"
     ] # A comment
     # The scope
-    "Scope" = @ # Another comment
+    "Scope" = % # Another comment
     "Short Message" = @ # All the comments all the time
     "Body" = !@ # So many comments!
 } # Another comment
