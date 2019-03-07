@@ -33,3 +33,4 @@
 - Show options in flat list if short?
 - Option to show files that have changed
     > Useful for things like ${Scope} - autocomplete maybe? `git diff --name-only`
+- Need to escape shell characters in Cmt.IO.Git

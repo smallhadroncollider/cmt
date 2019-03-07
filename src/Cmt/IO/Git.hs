@@ -10,9 +10,17 @@ import ClassyPrelude
 
 import System.Process (readCreateProcessWithExitCode, shell)
 
+-- copied from https://hackage.haskell.org/package/posix-escape
+escape :: String -> String
+escape xs = "'" ++ concatMap f xs ++ "'"
+  where
+    f '\0' = ""
+    f '\'' = "'\"'\"'"
+    f x    = [x]
+
 commit :: Text -> IO Text
 commit message = do
-    let msg = "git commit -m '" <> unpack message <> "'"
+    let msg = "git commit -m" <> escape (unpack message)
     (_, out, err) <- readCreateProcessWithExitCode (shell msg) ""
     pure $ unlines (pack <$> filter (not . null) [out, err])
 
