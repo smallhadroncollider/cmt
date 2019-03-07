@@ -41,6 +41,12 @@ If you're using the `${*}` format option then:
 cmt "blah blah blah" # this will go in ${*} place
 ```
 
+If the commit returns with a non-zero status code, your previous commit message is stored in a `.cmt.bkp` file. You can re-run the commit when you're ready with:
+
+```bash
+cmt --prev
+```
+
 ### Format
 
 A `.cmt` file consist of two parts: the input parts and the output format.

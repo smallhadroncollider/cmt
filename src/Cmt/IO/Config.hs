@@ -1,7 +1,9 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Cmt.IO.Config where
+module Cmt.IO.Config
+    ( load
+    ) where
 
 import ClassyPrelude
 
@@ -31,11 +33,6 @@ parse output cfg = config cfg >>= checkFormat output
 
 read :: FilePath -> IO Text
 read path = decodeUtf8 <$> readFile path
-
-parseArgs :: [Text] -> [Output]
-parseArgs []    = []
-parseArgs [msg] = [("*", msg)]
-parseArgs parts = [("*", unwords parts)]
 
 checkParent :: FilePath -> IO (Maybe FilePath)
 checkParent path = do
@@ -69,11 +66,9 @@ findFile = do
         Just fp -> pure $ Just fp
         Nothing -> homeDir
 
-load :: IO (Either Text (Config, [Output]))
-load = do
+load :: [Output] -> IO (Either Text (Config, [Output]))
+load output = do
     exists <- findFile
     case exists of
-        Just path -> do
-            output <- parseArgs <$> getArgs
-            parse output <$> read path
-        Nothing -> pure $ Left ".cmt file not found"
+        Just path -> parse output <$> read path
+        Nothing   -> pure $ Left ".cmt file not found"

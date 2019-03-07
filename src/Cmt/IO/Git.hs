@@ -8,6 +8,7 @@ module Cmt.IO.Git
 
 import ClassyPrelude
 
+import System.Exit    (ExitCode (ExitFailure))
 import System.Process (readCreateProcessWithExitCode, shell)
 
 -- copied from https://hackage.haskell.org/package/posix-escape
@@ -18,11 +19,15 @@ escape xs = "'" ++ concatMap f xs ++ "'"
     f '\'' = "'\"'\"'"
     f x    = [x]
 
-commit :: Text -> IO Text
+commit :: Text -> IO (Either Text Text)
 commit message = do
     let msg = "git commit -m" <> escape (unpack message)
-    (_, out, err) <- readCreateProcessWithExitCode (shell msg) ""
-    pure $ unlines (pack <$> filter (not . null) [out, err])
+    (code, out, err) <- readCreateProcessWithExitCode (shell msg) ""
+    let output = unlines (pack <$> filter (not . null) [out, err])
+    pure $
+        case code of
+            ExitFailure _ -> Left output
+            _             -> Right output
 
 changed :: IO [Text]
 changed = do

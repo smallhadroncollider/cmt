@@ -4,8 +4,6 @@
 
 ## Features
 
-- Store previous commit info if it fails
-    > Store if commit fails. `cmt --prev` option?
 - List option?
     > Automatically adds a hyphen to each entry?
 - Make parts optional
@@ -34,3 +32,5 @@
 - Option to show files that have changed
     > Useful for things like ${Scope} - autocomplete maybe? `git diff --name-only`
 - Need to escape shell characters in Cmt.IO.Git
+- Store previous commit info if it fails
+    > Store if commit fails. `cmt --prev` option?
