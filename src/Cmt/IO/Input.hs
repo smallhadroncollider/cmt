@@ -45,8 +45,12 @@ options opts = do
     displayOptions opts'
     chosen <- parse <$> prompt ">"
     case chosen of
-        Nothing      -> options opts
-        Just chosen' -> pure . intercalate ", " . catMaybes $ choice opts' <$> chosen'
+        Nothing -> options opts
+        Just chosen' -> do
+            let picked = catMaybes $ choice opts' <$> chosen'
+            if null picked
+                then options opts
+                else pure $ intercalate ", " picked
 
 multiLine :: [Text] -> IO [Text]
 multiLine input = do

@@ -1,11 +1,11 @@
 ## Bugs
 
 - Multi-line is always optional
+- Extra `\n` at end of output
+- Should throw an error if no staged changes?
 
 ## Features
 
-- Store previous commit info if it fails
-    > Store if commit fails. `cmt --prev` option?
 - List option?
     > Automatically adds a hyphen to each entry?
 - Make parts optional
@@ -33,3 +33,6 @@
 - Show options in flat list if short?
 - Option to show files that have changed
     > Useful for things like ${Scope} - autocomplete maybe? `git diff --name-only`
+- Need to escape shell characters in Cmt.IO.Git
+- Store previous commit info if it fails
+    > Store if commit fails. `cmt --prev` option?
