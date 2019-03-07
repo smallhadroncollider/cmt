@@ -13,12 +13,11 @@ data FormatPart
     | Literal Text
     deriving (Show, Eq)
 
-type Format = [FormatPart]
-
 data PartType
     = Options [Text]
     | Line
     | Lines
+    | Changed
     deriving (Show, Eq)
 
 data Part =
@@ -28,7 +27,7 @@ data Part =
 
 data Config =
     Config [Part]
-           Format
+           [FormatPart]
     deriving (Show, Eq)
 
 partName :: Part -> Name

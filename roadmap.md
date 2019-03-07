@@ -1,20 +1,15 @@
 ## Bugs
 
-- pre-commit errors don't get displayed at all
-    > Probably need to show stderr in some cases?
-- Extra new-line at the end of the output
+- Multi-line is always optional
 
 ## Features
 
-- Show options in flat list if short?
 - Store previous commit info if it fails
     > Store if commit fails. `cmt --prev` option?
 - List option?
     > Automatically adds a hyphen to each entry?
 - Make parts optional
     > @? and !@? operators?
-- Option to show files that have changed
-    > Useful for things like ${Scope} - autocomplete maybe?
 
 ## Doing
 
@@ -33,3 +28,8 @@
 - Should search up directories to find .cmt
 - Should support ~/.cmt for global option
 - Add comments to .cmt
+- pre-commit errors don't get displayed at all
+    > Probably need to show stderr in some cases?
+- Show options in flat list if short?
+- Option to show files that have changed
+    > Useful for things like ${Scope} - autocomplete maybe? `git diff --name-only`

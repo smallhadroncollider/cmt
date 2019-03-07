@@ -2,11 +2,30 @@
 
 Write consistent git commit messages
 
-## Installation
+## Install
+
+[Binaries for Mac and Linux are available](https://github.com/smallhadroncollider/cmt/releases). Add the binary to a directory in your path (such as `/usr/local/bin`).
+
+### Cabal
+
+**Requirements**: [Cabal](https://www.haskell.org/cabal/)
+
+```bash
+cabal install cmt
+```
+
+Make sure you run `cabal update` if you haven't run it recently.
+
+### Building
+
+**Requirements**: [Stack](https://docs.haskellstack.org/en/stable/README/)
+
+The following command will build cmt and then install it in `~/.local/bin`:
 
 ```bash
 stack build && stack install
 ```
+
 
 ## Usage
 
@@ -41,9 +60,9 @@ For example, the [AngularJS Commit Message Guidelines](https://gist.github.com/s
         "test",
         "chore"
     ]
-    "Scope" = @ # Allows a single line of input
-    "Subject" = @
-    "Body" = !@ # Allows multi-line input
+    "Scope" = % # Select from a list of staged files
+    "Subject" = @ # Single line input
+    "Body" = !@ # Multi-line input
     "Footer" = !@
 }
 
@@ -64,6 +83,7 @@ These are at the top of the `.cmt` file and surrounded by opening and closing cu
 
 - `@`: single line input
 - `!@`: multi line input
+- `%`: select from a list of staged files
 - `["option 1", "option 2"]`: list of options
 
 #### Output Format
@@ -78,7 +98,7 @@ For example:
 # Input parts
 # * input not needed, as comes from command-line
 {
-    "Scope" = @
+    "Scope" = %
 }
 
 # Scope from input and * from command-line
