@@ -1,6 +1,8 @@
 ## Bugs
 
 - Multi-line is always optional
+- Extra `\n` at end of output
+- Should throw an error if no staged changes?
 
 ## Features
 
