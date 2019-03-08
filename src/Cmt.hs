@@ -8,6 +8,7 @@ module Cmt
 import ClassyPrelude
 
 import System.Directory (removeFile)
+import System.Exit      (exitFailure, exitSuccess)
 
 import Cmt.IO.Config     (load)
 import Cmt.IO.Git        (commit)
@@ -26,10 +27,11 @@ send :: Text -> IO ()
 send txt = do
     commited <- commit txt
     case commited of
-        Right msg -> putStrLn msg
+        Right msg -> putStrLn msg >> exitSuccess
         Left msg -> do
             writeFile backup (encodeUtf8 txt)
             putStrLn msg
+            exitFailure
 
 display :: Either Text (Config, [Output]) -> IO ()
 display (Left err) = putStrLn err
