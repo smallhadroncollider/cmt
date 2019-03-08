@@ -23,7 +23,7 @@ tnotChar :: Char -> Parser Text
 tnotChar c = pack <$> many1 (notChar c)
 
 commentP :: Parser ()
-commentP = lexeme $ many' (char '#' *> many' (notChar '\n') *> char '\n') $> ()
+commentP = lexeme $ skipMany (char '#' *> manyTill anyChar endOfLine)
 
 stripComments :: Parser a -> Parser a
 stripComments p = lexeme $ commentP *> p <* commentP
