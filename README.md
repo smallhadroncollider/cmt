@@ -41,6 +41,12 @@ If you're using the `${*}` format option then:
 cmt "blah blah blah" # this will go in ${*} place
 ```
 
+If there are commit message you use frequently (such as "version bump"), you can setup predefined messages with aliases:
+
+```bash
+cmt -p vb # use the version bump message
+```
+
 If the commit returns with a non-zero status code, your previous commit message is stored in a `.cmt.bkp` file. You can re-run the commit when you're ready with:
 
 ```bash
@@ -70,6 +76,12 @@ For example, the [AngularJS Commit Message Guidelines](https://gist.github.com/s
     "Subject" = @ # Single line input
     "Body" = !@ # Multi-line input
     "Footer" = !@
+}
+
+# predefined messages
+{
+    vb = "chore (package.yaml): version bump"
+    readme = "docs (README.md): updated readme"
 }
 
 # The output format

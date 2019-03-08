@@ -11,7 +11,7 @@ import Test.Tasty.HUnit
 
 import Data.FileEmbed (embedFile)
 
-import Cmt.Parser.Config (config)
+import Cmt.Parser.Config (config, predefined)
 import Cmt.Types.Config
 
 basic :: Text
@@ -44,18 +44,39 @@ angularConfig =
         , Literal "\n"
         ]
 
+pre :: Text
+pre = decodeUtf8 $(embedFile "test/data/.cmt-predefined")
+
 -- import Test.Tasty.HUnit
 test_config :: TestTree
 test_config =
     testGroup
         "Cmt.Parser.Config"
-        [ testCase
-              "basic"
-              (assertEqual "Gives back correct format" (Right basicConfig) (config basic))
-        , testCase
-              "angular"
-              (assertEqual "Gives back correct format" (Right angularConfig) (config angular))
-        , testCase
-              "comments"
-              (assertEqual "Gives back correct format" (Right angularConfig) (config comments))
+        [ testGroup
+              "config"
+              [ testCase
+                    "basic"
+                    (assertEqual "Gives back correct format" (Right basicConfig) (config basic))
+              , testCase
+                    "angular"
+                    (assertEqual "Gives back correct format" (Right angularConfig) (config angular))
+              , testCase
+                    "comments"
+                    (assertEqual "Gives back correct format" (Right angularConfig) (config comments))
+              ]
+        , testGroup
+              "predefined"
+              [ testCase
+                    "angular"
+                    (assertEqual "Gives back correct format" (Right []) (predefined comments))
+              , testCase
+                    "predefined"
+                    (assertEqual
+                         "Gives back correct format"
+                         (Right
+                              [ ("vb", "chore (package.yaml): version bump")
+                              , ("readme", "docs (README.md): updated readme")
+                              ])
+                         (predefined pre))
+              ]
         ]

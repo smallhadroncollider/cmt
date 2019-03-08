@@ -3,6 +3,7 @@
 
 module Cmt.IO.Config
     ( load
+    , readCfg
     ) where
 
 import ClassyPrelude
@@ -66,9 +67,14 @@ findFile = do
         Just fp -> pure $ Just fp
         Nothing -> homeDir
 
-load :: [Output] -> IO (Either Text (Config, [Output]))
-load output = do
+load :: IO (Either Text Text)
+load = do
     exists <- findFile
     case exists of
-        Just path -> parse output <$> read path
+        Just path -> Right <$> read path
         Nothing   -> pure $ Left ".cmt file not found"
+
+readCfg :: [Output] -> IO (Either Text (Config, [Output]))
+readCfg output = do
+    cfg <- load
+    pure (parse output =<< cfg)

@@ -1,4 +1,5 @@
 .stack-work/
 cmt.cabal
+.cmt.bkp
 *~
 releases/

@@ -3,92 +3,33 @@
 
 module Cmt.Parser.Config
     ( config
+    , predefined
     ) where
 
 import ClassyPrelude
 
 import Data.Attoparsec.Text
 
-import Cmt.Parser.Attoparsec
+import Cmt.Parser.Config.Format     (formatP)
+import Cmt.Parser.Config.Parts      (partsP)
+import Cmt.Parser.Config.PreDefined (predefinedPartsP)
 import Cmt.Types.Config
-
--- useful bits
-tchar :: Char -> Parser Text
-tchar ch = singleton <$> char ch
-
-chopt :: Char -> Parser Text
-chopt ch = option "" (tchar ch)
-
-tnotChar :: Char -> Parser Text
-tnotChar c = pack <$> many1 (notChar c)
-
-commentP :: Parser ()
-commentP = lexeme $ many' (char '#' *> many' (notChar '\n') *> char '\n') $> ()
-
-stripComments :: Parser a -> Parser a
-stripComments p = lexeme $ commentP *> p <* commentP
-
-word :: Parser Text
-word = pack <$> many1 (letter <|> space)
-
-valid :: [Name] -> Parser Text
-valid names = choice $ "*" : (string <$> names)
-
--- format parts
-merge :: [FormatPart] -> FormatPart -> [FormatPart]
-merge ps (Literal str) = maybe [Literal str] merge' (fromNullable ps)
-  where
-    merge' ps' =
-        case last ps' of
-            Literal prev -> init ps' <> [Literal (prev <> str)]
-            _            -> ps <> [Literal str]
-merge ps p = ps <> [p]
-
-smoosh :: [FormatPart] -> [FormatPart]
-smoosh = foldl' merge []
-
-formatNamedP :: [Name] -> Parser FormatPart
-formatNamedP names = Named <$> (string "${" *> valid names <* char '}')
-
-formatLiteralP :: Parser FormatPart
-formatLiteralP = Literal <$> (singleton <$> anyChar)
-
-formatP :: [Name] -> Parser [FormatPart]
-formatP names = smoosh <$> stripComments (many1 (formatNamedP names <|> formatLiteralP))
-
--- input parts
-changedP :: Parser PartType
-changedP = char '%' $> Changed
-
-lineP :: Parser PartType
-lineP = char '@' $> Line
-
-linesP :: Parser PartType
-linesP = string "!@" $> Lines
-
-listItemP :: Parser Text
-listItemP = stripComments $ char '"' *> tnotChar '"' <* char '"' <* chopt ','
-
-listP :: Parser PartType
-listP = Options <$> (char '[' *> many' listItemP <* char ']')
-
--- name
-nameP :: Parser Text
-nameP = char '"' *> word <* char '"' <* lexeme (char '=')
-
--- part
-partP :: Parser Part
-partP = stripComments $ Part <$> nameP <*> (listP <|> lineP <|> linesP <|> changedP)
-
-partsP :: Parser [Part]
-partsP = stripComments $ stripComments (char '{') *> many' partP <* stripComments (char '}')
 
 configP :: Parser Config
 configP = do
     parts <- partsP
+    _ <- predefinedPartsP
     format <- formatP $ partName <$> parts
     _ <- endOfInput
     pure $ Config parts format
+
+predefinedP :: Parser [PreDefinedPart]
+predefinedP = do
+    parts <- partsP
+    pre <- predefinedPartsP
+    _ <- formatP $ partName <$> parts
+    _ <- endOfInput
+    pure pre
 
 -- run parser
 config :: Text -> Either Text Config
@@ -97,3 +38,9 @@ config cfg =
         Right c -> Right c
         Left _ ->
             Left "Could not parse config. Check that your format doesn't contain any invalid parts."
+
+predefined :: Text -> Either Text [PreDefinedPart]
+predefined cfg =
+    case parseOnly predefinedP cfg of
+        Right c -> Right c
+        Left _  -> Left "Could not parse config"
