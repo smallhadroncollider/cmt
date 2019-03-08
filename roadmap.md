@@ -37,3 +37,5 @@
     > Store if commit fails. `cmt --prev` option?
 - Extra `\n` at end of output
 - Should strip empty space/newlines from end of file
+- Way to store pre-written commits
+    > Occasionally used messages: e.g. "version bump", "latest notes", etc.

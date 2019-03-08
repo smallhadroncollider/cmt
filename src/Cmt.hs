@@ -11,18 +11,23 @@ import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (exitFailure, exitSuccess)
 
-import Cmt.IO.Config     (load)
+import Cmt.IO.Config     (load, readCfg)
 import Cmt.IO.Git        (commit)
 import Cmt.IO.Input      (loop)
 import Cmt.Output.Format (format)
+import Cmt.Parser.Config (predefined)
 import Cmt.Types.Config  (Config, Output)
 
 data Next
     = Previous
+    | PreDefined Text
     | Continue [Output]
 
 backup :: FilePath
 backup = ".cmt.bkp"
+
+failure :: Text -> IO ()
+failure msg = putStrLn msg >> exitFailure
 
 send :: Text -> IO ()
 send txt = do
@@ -31,8 +36,7 @@ send txt = do
         Right msg -> putStrLn msg >> exitSuccess
         Left msg -> do
             writeFile backup (encodeUtf8 txt)
-            putStrLn msg
-            exitFailure
+            failure msg
 
 display :: Either Text (Config, [Output]) -> IO ()
 display (Left err) = putStrLn err
@@ -46,15 +50,27 @@ previous = do
     removeFile backup
     send txt
 
+predef :: Text -> IO ()
+predef name = do
+    cfg <- load
+    case predefined =<< cfg of
+        Left msg -> failure msg
+        Right pre ->
+            case find ((==) name . fst) pre of
+                Nothing       -> failure "No matching predefined message"
+                Just (_, txt) -> send txt
+
 parseArgs :: [Text] -> Next
-parseArgs ["--prev"] = Previous
-parseArgs []         = Continue []
-parseArgs [msg]      = Continue [("*", msg)]
-parseArgs parts      = Continue [("*", unwords parts)]
+parseArgs ["--prev"]   = Previous
+parseArgs ["-p", name] = PreDefined name
+parseArgs []           = Continue []
+parseArgs [msg]        = Continue [("*", msg)]
+parseArgs parts        = Continue [("*", unwords parts)]
 
 go :: IO ()
 go = do
     next <- parseArgs <$> getArgs
     case next of
-        Continue output -> load output >>= display
+        Continue output -> readCfg output >>= display
         Previous        -> previous
+        PreDefined name -> predef name
