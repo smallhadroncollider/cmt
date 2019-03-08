@@ -1,7 +1,6 @@
 ## Bugs
 
 - Multi-line is always optional
-- Extra `\n` at end of output
 - Should throw an error if no staged changes?
 
 ## Features
@@ -36,3 +35,5 @@
 - Need to escape shell characters in Cmt.IO.Git
 - Store previous commit info if it fails
     > Store if commit fails. `cmt --prev` option?
+- Extra `\n` at end of output
+- Should strip empty space/newlines from end of file

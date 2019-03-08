@@ -7,6 +7,7 @@ module Cmt
 
 import ClassyPrelude
 
+import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (exitFailure, exitSuccess)
 
@@ -25,7 +26,7 @@ backup = ".cmt.bkp"
 
 send :: Text -> IO ()
 send txt = do
-    commited <- commit txt
+    commited <- commit $ stripEnd txt
     case commited of
         Right msg -> putStrLn msg >> exitSuccess
         Left msg -> do
