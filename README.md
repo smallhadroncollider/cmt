@@ -2,6 +2,8 @@
 
 Write consistent git commit messages
 
+![Demo](https://files.smallhadroncollider.com/cmt-0.4.gif)
+
 ## Install
 
 [Binaries for Mac and Linux are available](https://github.com/smallhadroncollider/cmt/releases). Add the binary to a directory in your path (such as `/usr/local/bin`).
