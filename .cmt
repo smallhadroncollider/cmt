@@ -9,17 +9,16 @@
         "test",
         "chore"
     ]
-    "Scope" = %
     "Body" = !@
 }
 
 # predefined messages
 {
-    vb = "chore (package.yaml): version bump"
-    readme = "docs (README.md): updated readme"
+    vb = "chore: version bump"
+    readme = "docs: updated readme"
 }
 
 # output format
-${Type} (${Scope}): ${*}
+${Type}: ${*}
 
 ${Body}
