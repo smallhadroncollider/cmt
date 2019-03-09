@@ -9,6 +9,13 @@
     > Automatically adds a hyphen to each entry?
 - Make parts optional
     > @? and !@? operators?
+- Character limits
+- Line length limits
+- Descriptions alongside part name
+- Repeated sections
+    > e.g. Co-Author: ${Name} ${Email}
+- Optional output bits
+    > e.g. (${Scope}) shouldn't show brackets if no Scope provided
 
 ## Doing
 
