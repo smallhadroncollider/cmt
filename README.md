@@ -16,7 +16,7 @@ Similar idea to [commitizen](https://github.com/commitizen/cz-cli), but with an 
 
 It's important to write consistent commit messages, but depending on the project you may well want to use different commit styles.
 
-With `cmt` you create a `.cmt` file in your project directory. The `.cmt` file enforces a particular style of commit message for that project. You also add predefined commit messages for things like version bumps and updating the readme.
+With `cmt` you create a `.cmt` file in your project directory. The `.cmt` file enforces a particular style of commit message for that project. You can also add predefined commit messages for things like version bumps and updating the readme.
 
 For example, for my programming projects I try to use a commit style similar to the [AngularJS Commit Message Guidelines](https://gist.github.com/stephenparish/9941e89d80e2bc58a153). However, this isn't appropriate for my teaching notes repos or for my capistrano build repos.
 
@@ -147,6 +147,8 @@ Add a `.cmt` file to your project directory.
 ```bash
 cmt # will show the options and then commit
 ```
+
+`cmt` will also look in your home directory if a `.cmt` file isn't found in the project directory hierarchy. This can be used to define a global commit style, which you can then override on a per-project basis.
 
 ### Predefined Messages
 
