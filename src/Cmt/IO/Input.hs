@@ -34,7 +34,7 @@ displayOptions opts = do
     maxLength <- getWidth
     if length long < maxLength
         then putStrLn long
-        else sequence_ $ putStrLn . listItem <$> opts
+        else traverse_ (putStrLn . listItem) opts
 
 choice :: [(Int, Text)] -> Int -> Maybe Text
 choice opts chosen = snd <$> find ((== chosen) . fst) opts
@@ -73,4 +73,4 @@ output (Part name Lines)          = putName name >> (,) name <$> (unlines <$> mu
 output (Part name Changed)        = putName name >> (,) name <$> (options =<< changed)
 
 loop :: Config -> IO [(Name, Text)]
-loop (Config parts _) = sequence $ output <$> parts
+loop (Config parts _) = traverse output parts
