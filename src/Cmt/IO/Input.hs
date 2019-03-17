@@ -37,7 +37,7 @@ displayOptions opts = do
         else traverse_ (putStrLn . listItem) opts
 
 choice :: [(Int, Text)] -> Int -> Maybe Text
-choice opts chosen = snd <$> find ((== chosen) . fst) opts
+choice opts chosen = lookup chosen opts
 
 options :: [Text] -> IO Text
 options opts = do

@@ -1,5 +1,4 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Cmt.Output.Format
     ( format
@@ -9,12 +8,9 @@ import ClassyPrelude
 
 import Cmt.Types.Config
 
-tidy :: [Output] -> FormatPart -> Text
-tidy _ (Literal c) = c
-tidy parts (Named name) =
-    case find ((== name) . fst) parts of
-        Just (_, t) -> t
-        Nothing     -> ""
+tidy :: [Output] -> FormatPart -> Maybe Text
+tidy _ (Literal c)      = Just c
+tidy parts (Named name) = lookup name parts
 
 format :: Config -> [Output] -> Text
-format (Config _ fmt) parts = concat $ tidy parts <$> fmt
+format (Config _ fmt) parts = concat . catMaybes $ tidy parts <$> fmt

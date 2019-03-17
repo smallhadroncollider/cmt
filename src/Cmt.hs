@@ -56,9 +56,9 @@ predef name = do
     case predefined =<< cfg of
         Left msg -> failure msg
         Right pre ->
-            case find ((==) name . fst) pre of
-                Nothing       -> failure "No matching predefined message"
-                Just (_, txt) -> send txt
+            case lookup name pre of
+                Nothing  -> failure "No matching predefined message"
+                Just txt -> send txt
 
 parseArgs :: [Text] -> Next
 parseArgs ["--prev"]   = Previous
