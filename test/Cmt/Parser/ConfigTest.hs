@@ -68,6 +68,9 @@ preWithVarsConfig =
           [ Part "Short Message" Line ]
           [ Literal "docs (README.md): ", Named "Short Message" ]
       )
+    , ( "multiline"
+      , Config [] [ Literal "This\nNow works # but comments are included\nI believe\n"]
+      )
     ]
 
 -- import Test.Tasty.HUnit
@@ -76,33 +79,33 @@ test_config =
     testGroup
         "Cmt.Parser.Config"
         [ testGroup
-             "config"
-             [ testCase
-                   "basic"
-                   (assertEqual "Gives back correct format" (Right basicConfig) (config basic))
-             , testCase
-                   "angular"
-                   (assertEqual "Gives back correct format" (Right angularConfig) (config angular))
-             , testCase
-                   "comments"
-                   (assertEqual "Gives back correct format" (Right angularConfig) (config comments))
-             ]
-       , testGroup
-             "predefined"
-             [ testCase
-                   "angular"
-                   (assertEqual "Gives back correct format" (Right []) (predefined comments))
-             , testCase
-                   "predefined"
-                   (assertEqual
-                        "Gives back correct format"
-                        (Right preConfig)
-                        (predefined pre))
-             , testCase
-                    "predefined with variables"
+              "config"
+              [ testCase
+                    "basic"
+                    (assertEqual "Gives back correct format" (Right basicConfig) (config basic))
+              , testCase
+                    "angular"
+                    (assertEqual "Gives back correct format" (Right angularConfig) (config angular))
+              , testCase
+                    "comments"
+                    (assertEqual "Gives back correct format" (Right angularConfig) (config comments))
+              ]
+        , testGroup
+              "predefined"
+              [ testCase
+                    "angular"
+                    (assertEqual "Gives back correct format" (Right []) (predefined comments))
+              , testCase
+                    "predefined"
                     (assertEqual
                          "Gives back correct format"
-                         (Right preWithVarsConfig)
-                         (predefined preWithVars))
-              ]
+                         (Right preConfig)
+                         (predefined pre))
+              , testCase
+                     "predefined with variables"
+                     (assertEqual
+                          "Gives back correct format"
+                          (Right preWithVarsConfig)
+                          (predefined preWithVars))
+               ]
         ]

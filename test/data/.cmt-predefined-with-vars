@@ -26,6 +26,11 @@
     # handy version bump message
     vb = "chore (${Scope}): version bump" # a comment
     readme = "docs (README.md): ${Short Message}" # another comment
+    multiline =
+"This
+Now works # but comments are included
+I believe
+" # another comment
     # comment everywhere
 }
 
