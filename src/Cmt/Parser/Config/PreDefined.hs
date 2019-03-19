@@ -14,21 +14,26 @@ import Cmt.Parser.Config.Format (formatP)
 import Cmt.Types.Config
 
 -- predefined
-value :: [Part] -> Parser Config
-value parts = do
-  template <- lexeme $ char '"' *> takeTill (== '"') <* char '"'
-  Config parts <$> getFormat template
+value :: Name -> [Part] -> Parser Config
+value name parts
+  = lexeme (char '"' *> takeTill (== '"') <* char '"')
+  >>= getConfig
   where
-    getFormat :: Text -> Parser [FormatPart]
-    getFormat template = case parseOnly (formatP $ partName <$> parts) template of
-      Left _ -> fail "invalid predefined template"
-      Right format -> pure format
+    getConfig :: Text -> Parser Config
+    getConfig template =
+      case parseOnly (formatP $ partName <$> parts) template of
+        Left _ -> fail $ "Invalid predefined template: " ++ show name
+        Right fmt -> pure $ Config (filterParts fmt parts) fmt
+
+    filterParts :: [FormatPart] -> [Part] -> [Part]
+    filterParts fps =
+      filter ((`elem` catMaybes (formatName <$> fps)) . partName)
 
 partP :: [Part] -> Parser PreDefinedPart
-partP ps =
-  stripComments $ (,)
-    <$> (pack <$> many' letter <* lexeme (char '='))
-    <*> stripComments (value ps)
+partP ps = stripComments $ do
+  name <- (pack <$> many' letter <* lexeme (char '='))
+  conf <- stripComments (value name ps)
+  pure (name, conf)
 
 predefinedPartsP :: [Part] -> Parser [PreDefinedPart]
 predefinedPartsP ps =

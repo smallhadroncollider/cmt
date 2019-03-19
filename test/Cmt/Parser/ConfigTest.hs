@@ -52,29 +52,23 @@ preWithVars = decodeUtf8 $(embedFile "test/data/.cmt-predefined-with-vars")
 
 preConfig :: [PreDefinedPart]
 preConfig =
-    [ ("vb", Config parts [ Literal "chore (package.yaml): version bump"])
-    , ("readme", Config parts [ Literal "docs (README.md): updated readme"])
+    [ ("vb", Config [] [ Literal "chore (package.yaml): version bump"])
+    , ("readme", Config [] [ Literal "docs (README.md): updated readme"])
     ]
-  where
-    parts =
-      [ Part "Type" (Options ["feat", "fix", "docs", "style", "refactor", "test", "chore"])
-      , Part "Scope" Changed
-      , Part "Short Message" Line
-      , Part "Body" Lines
-      ]
 
 preWithVarsConfig :: [PreDefinedPart]
 preWithVarsConfig =
-    [ ("vb", Config parts [ Literal "chore (", Named "Scope", Literal "): version bump"])
-    , ("readme", Config parts [ Literal "docs (README.md): ", Named "Short Message"])
+    [ ( "vb"
+      , Config
+          [ Part "Scope" Changed ]
+          [ Literal "chore (", Named "Scope", Literal "): version bump"]
+      )
+    , ( "readme"
+      , Config
+          [ Part "Short Message" Line ]
+          [ Literal "docs (README.md): ", Named "Short Message" ]
+      )
     ]
-  where
-    parts =
-      [ Part "Type" (Options ["feat", "fix", "docs", "style", "refactor", "test", "chore"])
-      , Part "Scope" Changed
-      , Part "Short Message" Line
-      , Part "Body" Lines
-      ]
 
 -- import Test.Tasty.HUnit
 test_config :: TestTree

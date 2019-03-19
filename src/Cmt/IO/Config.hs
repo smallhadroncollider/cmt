@@ -4,6 +4,7 @@
 module Cmt.IO.Config
     ( load
     , readCfg
+    , checkFormat
     ) where
 
 import ClassyPrelude

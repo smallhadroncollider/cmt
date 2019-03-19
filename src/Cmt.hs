@@ -11,7 +11,7 @@ import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (exitFailure, exitSuccess)
 
-import Cmt.IO.Config     (load, readCfg)
+import Cmt.IO.Config     (load, readCfg, checkFormat)
 import Cmt.IO.Git        (commit)
 import Cmt.IO.Input      (loop)
 import Cmt.Output.Format (format)
@@ -58,7 +58,7 @@ predef name output = do
         Right pre ->
             case find ((==) name . fst) pre of
                 Nothing       -> failure "No matching predefined message"
-                Just (_, txt) -> readCfg output >>= display
+                Just (_, cfg) -> display $ checkFormat output cfg
 
 parseArgs :: [Text] -> Next
 parseArgs ["--prev"]        = Previous
