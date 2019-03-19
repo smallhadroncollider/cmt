@@ -20,7 +20,7 @@ import Cmt.Types.Config  (Config, Output)
 
 data Next
     = Previous
-    | PreDefined Text
+    | PreDefined Text [Output]
     | Continue [Output]
 
 backup :: FilePath
@@ -50,22 +50,24 @@ previous = do
     removeFile backup
     send txt
 
-predef :: Text -> IO ()
-predef name = do
+predef :: Text -> [Output] -> IO ()
+predef name output = do
     cfg <- load
     case predefined =<< cfg of
         Left msg -> failure msg
         Right pre ->
             case find ((==) name . fst) pre of
                 Nothing       -> failure "No matching predefined message"
-                Just (_, txt) -> send txt
+                Just (_, txt) -> readCfg output >>= display
 
 parseArgs :: [Text] -> Next
-parseArgs ["--prev"]   = Previous
-parseArgs ["-p", name] = PreDefined name
-parseArgs []           = Continue []
-parseArgs [msg]        = Continue [("*", msg)]
-parseArgs parts        = Continue [("*", unwords parts)]
+parseArgs ["--prev"]        = Previous
+parseArgs ["-p", name]      = PreDefined name []
+parseArgs ["-p", name, msg] = PreDefined name [("*", msg)]
+parseArgs ("-p":name:parts) = PreDefined name [("*", unwords parts)]
+parseArgs []                = Continue []
+parseArgs [msg]             = Continue [("*", msg)]
+parseArgs parts             = Continue [("*", unwords parts)]
 
 go :: IO ()
 go = do
@@ -73,4 +75,4 @@ go = do
     case next of
         Continue output -> readCfg output >>= display
         Previous        -> previous
-        PreDefined name -> predef name
+        PreDefined name output -> predef name output

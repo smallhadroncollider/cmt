@@ -1,0 +1,36 @@
+# The input parts
+# Blah blah blah
+#
+# Blah blah blah
+
+# Blah blah blah
+{ # A comment
+    # A list of stuff
+    "Type" = [ # A list of options
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor", ## A comment here too
+        "test",
+        "chore"
+    ] # A comment
+    # The scope
+    "Scope" = % # Another comment
+    "Short Message" = @ # All the comments all the time
+    "Body" = !@ # So many comments!
+} # Another comment
+
+# predefined messages
+{
+    # handy version bump message
+    vb = "chore (${Scope}): version bump" # a comment
+    readme = "docs (README.md): ${Short Message}" # another comment
+    # comment everywhere
+}
+
+# Blah blah blah
+# Blah blah blah
+${Type} (${Scope}): ${Short Message}
+
+${Body}
