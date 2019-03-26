@@ -10,15 +10,33 @@ import ClassyPrelude
 import Data.Attoparsec.Text
 
 import Cmt.Parser.Attoparsec
+import Cmt.Parser.Config.Format (formatP)
 import Cmt.Types.Config
 
 -- predefined
-value :: Parser Text
-value = lexeme $ char '"' *> tnotChar '"' <* char '"'
+value :: Name -> [Part] -> Parser Config
+value name parts
+  = lexeme (char '"' *> takeTill (== '"') <* char '"')
+  >>= getConfig
+  where
+    getConfig :: Text -> Parser Config
+    getConfig template =
+      case parseOnly (formatP $ partName <$> parts) template of
+        Left _ -> fail $ "Invalid predefined template: " ++ show name
+        Right fmt -> pure $ Config (filterParts fmt parts) fmt
 
-partP :: Parser PreDefinedPart
-partP = stripComments $ (,) <$> (pack <$> many' letter <* lexeme (char '=')) <*> value
+    filterParts :: [FormatPart] -> [Part] -> [Part]
+    filterParts fps =
+      filter ((`elem` catMaybes (formatName <$> fps)) . partName)
 
-predefinedPartsP :: Parser [PreDefinedPart]
-predefinedPartsP =
-    stripComments $ option [] (stripComments (char '{') *> many' partP <* stripComments (char '}'))
+partP :: [Part] -> Parser PreDefinedPart
+partP ps = stripComments $ do
+  name <- (pack <$> many' letter <* lexeme (char '='))
+  conf <- stripComments (value name ps)
+  pure (name, conf)
+
+predefinedPartsP :: [Part] -> Parser [PreDefinedPart]
+predefinedPartsP ps =
+  option [] $
+    stripComments (char '{') *> many' (partP ps) <* stripComments (char '}')
+

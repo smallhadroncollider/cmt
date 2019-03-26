@@ -6,7 +6,7 @@ import ClassyPrelude (Eq, Maybe (..), Show, Text)
 
 type Output = (Name, Text)
 
-type PreDefinedPart = (Text, Text)
+type PreDefinedPart = (Text, Config)
 
 type Name = Text
 
