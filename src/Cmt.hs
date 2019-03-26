@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt
     ( go
@@ -16,12 +17,12 @@ import Cmt.IO.Git        (commit)
 import Cmt.IO.Input      (loop)
 import Cmt.Output.Format (format)
 import Cmt.Parser.Config (predefined)
-import Cmt.Types.Config  (Config, Output)
+import Cmt.Types.Config  (Config, Outputs)
 
 data Next
     = Previous
     | PreDefined Text
-    | Continue [Output]
+    | Continue Outputs
 
 backup :: FilePath
 backup = ".cmt.bkp"
@@ -38,7 +39,7 @@ send txt = do
             writeFile backup (encodeUtf8 txt)
             failure msg
 
-display :: Either Text (Config, [Output]) -> IO ()
+display :: Either Text (Config, Outputs) -> IO ()
 display (Left err) = putStrLn err
 display (Right (cfg, output)) = do
     parts <- loop cfg

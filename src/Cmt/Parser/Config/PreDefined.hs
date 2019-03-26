@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt.Parser.Config.PreDefined
     ( predefinedPartsP
@@ -19,6 +19,7 @@ value = lexeme $ char '"' *> tnotChar '"' <* char '"'
 partP :: Parser PreDefinedPart
 partP = stripComments $ (,) <$> (pack <$> many' letter <* lexeme (char '=')) <*> value
 
-predefinedPartsP :: Parser [PreDefinedPart]
+predefinedPartsP :: Parser PreDefinedParts
 predefinedPartsP =
-    stripComments $ option [] (stripComments (char '{') *> many' partP <* stripComments (char '}'))
+    stripComments $
+    mapFromList <$> option [] (stripComments (char '{') *> many' partP <* stripComments (char '}'))

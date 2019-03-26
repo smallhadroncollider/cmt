@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt.IO.Input
     ( loop
@@ -7,11 +8,14 @@ module Cmt.IO.Input
 
 import ClassyPrelude
 
+import Data.Map.Strict              (Map)
 import System.Console.Terminal.Size (size, width)
 
 import Cmt.IO.Git         (changed)
 import Cmt.Parser.Options (parse)
 import Cmt.Types.Config
+
+type Choice = Map Int Text
 
 prompt :: Text -> IO Text
 prompt s = do
@@ -25,23 +29,27 @@ getWidth = maybe 0 width <$> size
 putName :: Text -> IO ()
 putName name = putStrLn $ "\n" <> name <> ":"
 
-listItem :: (Int, Text) -> Text
-listItem (n, o) = tshow n <> ") " <> o
+listItem :: Int -> Text -> Text
+listItem n o = tshow n <> ") " <> o
 
-displayOptions :: [(Int, Text)] -> IO ()
+displayOptions :: Choice -> IO ()
 displayOptions opts = do
-    let long = intercalate "   " $ listItem <$> opts
+    let parts = mapWithKey listItem opts
+    let long = intercalate "   " parts
     maxLength <- getWidth
     if length long < maxLength
         then putStrLn long
-        else traverse_ (putStrLn . listItem) opts
+        else sequence_ $ putStrLn <$> parts
 
-choice :: [(Int, Text)] -> Int -> Maybe Text
+choice :: Choice -> Int -> Maybe Text
 choice opts chosen = lookup chosen opts
+
+choiceGen :: [Text] -> Choice
+choiceGen ts = mapFromList $ zip [1 ..] ts
 
 options :: [Text] -> IO Text
 options opts = do
-    let opts' = zip [1 ..] opts
+    let opts' = choiceGen opts
     displayOptions opts'
     chosen <- parse <$> prompt ">"
     case chosen of
@@ -66,11 +74,11 @@ line = do
         then line
         else pure value
 
-output :: Part -> IO (Name, Text)
+output :: Part -> IO Output
 output (Part name Line)           = putName name >> (,) name <$> line
 output (Part name (Options opts)) = putName name >> (,) name <$> options opts
 output (Part name Lines)          = putName name >> (,) name <$> (unlines <$> multiLine [])
 output (Part name Changed)        = putName name >> (,) name <$> (options =<< changed)
 
-loop :: Config -> IO [(Name, Text)]
-loop (Config parts _) = traverse output parts
+loop :: Config -> IO Outputs
+loop (Config parts _) = mapFromList <$> traverse output parts

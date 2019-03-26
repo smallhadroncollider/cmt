@@ -25,6 +25,7 @@ library:
   source-dirs: src
   dependencies:
   - attoparsec
+  - containers
   - text
   - directory
   - filepath

@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt.Parser.Config
     ( config
@@ -23,7 +24,7 @@ configP = do
     _ <- endOfInput
     pure $ Config parts format
 
-predefinedP :: Parser [PreDefinedPart]
+predefinedP :: Parser PreDefinedParts
 predefinedP = do
     parts <- partsP
     pre <- predefinedPartsP
@@ -39,7 +40,7 @@ config cfg =
         Left _ ->
             Left "Could not parse config. Check that your format doesn't contain any invalid parts."
 
-predefined :: Text -> Either Text [PreDefinedPart]
+predefined :: Text -> Either Text PreDefinedParts
 predefined cfg =
     case parseOnly predefinedP cfg of
         Right c -> Right c
