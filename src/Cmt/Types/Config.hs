@@ -9,9 +9,9 @@ type Output = (Name, Text)
 
 type Outputs = Map Name Text
 
-type PreDefinedPart = (Text, Text)
+type PreDefinedPart = (Text, Config)
 
-type PreDefinedParts = Map Text Text
+type PreDefinedParts = Map Text Config
 
 type Name = Text
 

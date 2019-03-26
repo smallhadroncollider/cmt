@@ -19,7 +19,7 @@ import Cmt.Types.Config
 configP :: Parser Config
 configP = do
     parts <- partsP
-    _ <- predefinedPartsP
+    _ <- predefinedPartsP parts
     format <- formatP $ partName <$> parts
     _ <- endOfInput
     pure $ Config parts format
@@ -27,7 +27,7 @@ configP = do
 predefinedP :: Parser PreDefinedParts
 predefinedP = do
     parts <- partsP
-    pre <- predefinedPartsP
+    pre <- predefinedPartsP parts
     _ <- formatP $ partName <$> parts
     _ <- endOfInput
     pure pre

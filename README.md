@@ -112,6 +112,22 @@ For example, with the following config, `cmt -p vb` would use the message "versi
 vb = "version bump"
 ```
 
+Predefined messages can also use any input parts defined in the prior section. An example of this would be:
+
+```txt
+{
+    "Project" = [
+        "ghc",
+        "cabal"
+    ]
+}
+{
+    vb = "${Project}: version bump"
+}
+```
+
+Running `cmt -p vb` will now prompt you to select which project is getting version bumped.
+
 ### Output Format
 
 The output format consists of named input parts (`${<name>}`) plus anything else you want.
