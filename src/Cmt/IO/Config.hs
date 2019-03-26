@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt.IO.Config
     ( load
@@ -19,7 +20,7 @@ import Cmt.Types.Config
 configFile :: FilePath
 configFile = ".cmt"
 
-checkFormat :: [Output] -> Config -> Either Text (Config, [Output])
+checkFormat :: Outputs -> Config -> Either Text (Config, Outputs)
 checkFormat output (Config parts format) = do
     let partNames = nub $ partName <$> parts
     let formatNames = nub . catMaybes $ formatName <$> format
@@ -30,7 +31,7 @@ checkFormat output (Config parts format) = do
             | otherwise = Right (Config parts format, output)
     result
 
-parse :: [Output] -> Text -> Either Text (Config, [Output])
+parse :: Outputs -> Text -> Either Text (Config, Outputs)
 parse output cfg = config cfg >>= checkFormat output
 
 read :: FilePath -> IO Text
@@ -75,7 +76,7 @@ load = do
         Just path -> Right <$> read path
         Nothing   -> pure $ Left ".cmt file not found"
 
-readCfg :: [Output] -> IO (Either Text (Config, [Output]))
+readCfg :: Outputs -> IO (Either Text (Config, Outputs))
 readCfg output = do
     cfg <- load
     pure (parse output =<< cfg)

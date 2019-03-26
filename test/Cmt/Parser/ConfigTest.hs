@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Cmt.Parser.ConfigTest where
@@ -50,27 +51,19 @@ pre = decodeUtf8 $(embedFile "test/data/.cmt-predefined")
 preWithVars :: Text
 preWithVars = decodeUtf8 $(embedFile "test/data/.cmt-predefined-with-vars")
 
-preConfig :: [PreDefinedPart]
+preConfig :: PreDefinedParts
 preConfig =
-    [ ("vb", Config [] [ Literal "chore (package.yaml): version bump"])
-    , ("readme", Config [] [ Literal "docs (README.md): updated readme"])
+    [ ("vb", Config [] [Literal "chore (package.yaml): version bump"])
+    , ("readme", Config [] [Literal "docs (README.md): updated readme"])
     ]
 
-preWithVarsConfig :: [PreDefinedPart]
+preWithVarsConfig :: PreDefinedParts
 preWithVarsConfig =
     [ ( "vb"
-      , Config
-          [ Part "Scope" Changed ]
-          [ Literal "chore (", Named "Scope", Literal "): version bump"]
-      )
+      , Config [Part "Scope" Changed] [Literal "chore (", Named "Scope", Literal "): version bump"])
     , ( "readme"
-      , Config
-          [ Part "Short Message" Line ]
-          [ Literal "docs (README.md): ", Named "Short Message" ]
-      )
-    , ( "multiline"
-      , Config [] [ Literal "This\nNow works # but comments are included\nI believe\n"]
-      )
+      , Config [Part "Short Message" Line] [Literal "docs (README.md): ", Named "Short Message"])
+    , ("multiline", Config [] [Literal "This\nNow works # but comments are included\nI believe\n"])
     ]
 
 -- import Test.Tasty.HUnit
@@ -97,15 +90,12 @@ test_config =
                     (assertEqual "Gives back correct format" (Right []) (predefined comments))
               , testCase
                     "predefined"
+                    (assertEqual "Gives back correct format" (Right preConfig) (predefined pre))
+              , testCase
+                    "predefined with variables"
                     (assertEqual
                          "Gives back correct format"
-                         (Right preConfig)
-                         (predefined pre))
-              , testCase
-                     "predefined with variables"
-                     (assertEqual
-                          "Gives back correct format"
-                          (Right preWithVarsConfig)
-                          (predefined preWithVars))
-               ]
+                         (Right preWithVarsConfig)
+                         (predefined preWithVars))
+              ]
         ]

@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt
     ( go
@@ -11,17 +12,18 @@ import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (exitFailure, exitSuccess)
 
-import Cmt.IO.Config     (load, readCfg, checkFormat)
+import Cmt.IO.Config     (checkFormat, load, readCfg)
 import Cmt.IO.Git        (commit)
 import Cmt.IO.Input      (loop)
 import Cmt.Output.Format (format)
 import Cmt.Parser.Config (predefined)
-import Cmt.Types.Config  (Config, Output)
+import Cmt.Types.Config  (Config, Outputs)
 
 data Next
     = Previous
-    | PreDefined Text [Output]
-    | Continue [Output]
+    | PreDefined Text
+                 Outputs
+    | Continue Outputs
 
 backup :: FilePath
 backup = ".cmt.bkp"
@@ -38,7 +40,7 @@ send txt = do
             writeFile backup (encodeUtf8 txt)
             failure msg
 
-display :: Either Text (Config, [Output]) -> IO ()
+display :: Either Text (Config, Outputs) -> IO ()
 display (Left err) = putStrLn err
 display (Right (cfg, output)) = do
     parts <- loop cfg
@@ -50,15 +52,15 @@ previous = do
     removeFile backup
     send txt
 
-predef :: Text -> [Output] -> IO ()
+predef :: Text -> Outputs -> IO ()
 predef name output = do
     cfg <- load
     case predefined =<< cfg of
         Left msg -> failure msg
         Right pre ->
-            case find ((==) name . fst) pre of
-                Nothing       -> failure "No matching predefined message"
-                Just (_, cfg) -> display $ checkFormat output cfg
+            case lookup name pre of
+                Nothing -> failure "No matching predefined message"
+                Just cf -> display $ checkFormat output cf
 
 parseArgs :: [Text] -> Next
 parseArgs ["--prev"]        = Previous
@@ -73,6 +75,6 @@ go :: IO ()
 go = do
     next <- parseArgs <$> getArgs
     case next of
-        Continue output -> readCfg output >>= display
-        Previous        -> previous
+        Continue output        -> readCfg output >>= display
+        Previous               -> previous
         PreDefined name output -> predef name output

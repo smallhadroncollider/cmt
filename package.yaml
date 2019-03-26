@@ -1,5 +1,5 @@
 name:                cmt
-version:             0.4.0.0
+version:             0.5.0.0
 github:              "smallhadroncollider/cmt"
 license:             BSD3
 author:              "Small Hadron Collider / Mark Wales"
@@ -25,6 +25,7 @@ library:
   source-dirs: src
   dependencies:
   - attoparsec
+  - containers
   - text
   - directory
   - filepath

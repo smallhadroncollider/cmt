@@ -1,5 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt.Parser.Config.PreDefined
     ( predefinedPartsP
@@ -15,28 +15,24 @@ import Cmt.Types.Config
 
 -- predefined
 value :: Name -> [Part] -> Parser Config
-value name parts
-  = lexeme (char '"' *> takeTill (== '"') <* char '"')
-  >>= getConfig
+value name parts = lexeme (char '"' *> takeTill (== '"') <* char '"') >>= getConfig
   where
     getConfig :: Text -> Parser Config
     getConfig template =
-      case parseOnly (formatP $ partName <$> parts) template of
-        Left _ -> fail $ "Invalid predefined template: " ++ show name
-        Right fmt -> pure $ Config (filterParts fmt parts) fmt
-
+        case parseOnly (formatP $ partName <$> parts) template of
+            Left _    -> fail $ "Invalid predefined template: " ++ show name
+            Right fmt -> pure $ Config (filterParts fmt parts) fmt
     filterParts :: [FormatPart] -> [Part] -> [Part]
-    filterParts fps =
-      filter ((`elem` catMaybes (formatName <$> fps)) . partName)
+    filterParts fps = filter ((`elem` catMaybes (formatName <$> fps)) . partName)
 
 partP :: [Part] -> Parser PreDefinedPart
-partP ps = stripComments $ do
-  name <- (pack <$> many' letter <* lexeme (char '='))
-  conf <- stripComments (value name ps)
-  pure (name, conf)
+partP ps =
+    stripComments $ do
+        name <- pack <$> many' letter <* lexeme (char '=')
+        conf <- stripComments (value name ps)
+        pure (name, conf)
 
-predefinedPartsP :: [Part] -> Parser [PreDefinedPart]
+predefinedPartsP :: [Part] -> Parser PreDefinedParts
 predefinedPartsP ps =
-  option [] $
-    stripComments (char '{') *> many' (partP ps) <* stripComments (char '}')
-
+    mapFromList <$>
+    option [] (stripComments (char '{') *> many' (partP ps) <* stripComments (char '}'))
