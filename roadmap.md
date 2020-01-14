@@ -3,7 +3,7 @@
 - Multi-line is always optional
 - Multi-line always shows two entry inputs, even if first is empty
 - Should throw an error if no staged changes?
-- Should throw an error if `.cmt.bkp` missing and using `--prev`
+- Remove `.cmt.bkp` on success `--prev`
 
 ## Features
 
@@ -52,3 +52,4 @@
 - Should pipe input out as it's happening
 - XDG Base Directory support for `.cmt` file
 - `--dry-run` option
+- Should throw an error if `.cmt.bkp` missing and using `--prev`

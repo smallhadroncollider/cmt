@@ -11,7 +11,7 @@ import ClassyPrelude
 
 import Data.FileEmbed   (embedFile)
 import Data.Text        (stripEnd)
-import System.Directory (removeFile)
+import System.Directory (doesFileExist, removeFile)
 import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
 
 import Cmt.IO.CLI           (blank, errorMessage, header, mehssage, message)
@@ -68,9 +68,12 @@ display (Right (cfg, output)) = do
 
 previous :: App
 previous = do
-    txt <- decodeUtf8 <$> readFile backup
-    lift $ removeFile backup
-    send txt
+    exists <- lift $ doesFileExist backup
+    if exists
+        then (do txt <- decodeUtf8 <$> readFile backup
+                 lift $ removeFile backup
+                 send txt)
+        else (failure "No previous commit attempts")
 
 predef :: Text -> Outputs -> App
 predef name output = do
