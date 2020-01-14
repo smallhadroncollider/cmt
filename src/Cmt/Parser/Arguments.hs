@@ -18,7 +18,7 @@ outputsP :: Parser Outputs
 outputsP =
     lexeme $ do
         message <- takeText
-        pure $ [("*", message)]
+        pure [("*", message)]
 
 emptyOutputsP :: Parser Outputs
 emptyOutputsP = endOfInput $> []
