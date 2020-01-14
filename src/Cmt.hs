@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedLists #-}
 
@@ -8,6 +9,7 @@ module Cmt
 
 import ClassyPrelude
 
+import Data.FileEmbed   (embedFile)
 import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
@@ -26,6 +28,10 @@ data Next
     | Continue Outputs
     | Version
     | ConfigLocation
+    | Help
+
+helpText :: Text
+helpText = decodeUtf8 $(embedFile "templates/usage.txt")
 
 backup :: FilePath
 backup = ".cmt.bkp"
@@ -72,6 +78,7 @@ configLocation = do
         Nothing   -> putStrLn ".cmt file not found"
 
 parseArgs :: [Text] -> Next
+parseArgs ["-h"]            = Help
 parseArgs ["-v"]            = Version
 parseArgs ["-c"]            = ConfigLocation
 parseArgs ["--prev"]        = Previous
@@ -88,6 +95,7 @@ next Previous                 = previous
 next (PreDefined name output) = predef name output
 next Version                  = putStrLn "0.6.0"
 next ConfigLocation           = configLocation
+next Help                     = putStrLn helpText
 
 go :: IO ()
 go = next =<< parseArgs <$> getArgs

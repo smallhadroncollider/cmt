@@ -1,0 +1,7 @@
+Usage: cmt [message]
+
+Options:
+
+-h      Display this help message
+-c      Display location of .cmt file
+-v      Display version number
