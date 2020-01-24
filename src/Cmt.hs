@@ -24,6 +24,7 @@ data Next
     | PreDefined Text
                  Outputs
     | Continue Outputs
+    | Version
 
 backup :: FilePath
 backup = ".cmt.bkp"
@@ -63,6 +64,7 @@ predef name output = do
                 Just cf -> display $ checkFormat output cf
 
 parseArgs :: [Text] -> Next
+parseArgs ["-v"]            = Version
 parseArgs ["--prev"]        = Previous
 parseArgs ["-p", name]      = PreDefined name []
 parseArgs ["-p", name, msg] = PreDefined name [("*", msg)]
@@ -78,3 +80,4 @@ go = do
         Continue output        -> readCfg output >>= display
         Previous               -> previous
         PreDefined name output -> predef name output
+        Version                -> putStrLn "0.5.0"
