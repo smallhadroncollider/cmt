@@ -80,4 +80,4 @@ go = do
         Continue output        -> readCfg output >>= display
         Previous               -> previous
         PreDefined name output -> predef name output
-        Version                -> putStrLn "0.5.0"
+        Version                -> putStrLn "0.6.0"
