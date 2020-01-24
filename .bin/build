@@ -1,6 +1,7 @@
-resolver="lts-13.13"
-ghcv="8.6.4"
+# stop on any errors
+set -e
 
+workDir=".stack-build"
 branch=$(git rev-parse --abbrev-ref HEAD)
 
 if [ $branch != "master" ]; then
@@ -8,7 +9,7 @@ if [ $branch != "master" ]; then
     exit
 fi
 
-if [ ! -d ".stack-work" ]; then
+if [ ! -d "$workDir" ]; then
     echo "\033[0;31mMust be run in project root\033[0m"
     exit
 fi
@@ -18,40 +19,58 @@ if [ -z "$1" ]; then
     exit
 fi
 
+# stash any changes
+git stash
+
+# check cabal build works
+cabal build
+
+if [ $? -ne 0 ]
+then
+    git stash pop
+    echo "\033[0;31mCabal build failed\033[0m"
+    exit
+fi
+
 # make sure latest changes pushed to github
 git push --all && git push --tags
 
 # clean out previous build attempts
-rm -rf .stack-work/install
+rm -rf "$workDir/install"
 
 # sort out releases directory
 rm -rf "releases/$1/cmt"
 mkdir -p "releases/$1/cmt"
 
 # Mac
-stack build --ghc-options -O3
+stack build --work-dir "$workDir" --ghc-options -O3
 
-tar -czvf "releases/$1/cmt-$1_x86-64-mac.tar.gz" --directory=".stack-work/install/x86_64-osx/$resolver/$ghcv/bin" "cmt"
+strip "$(stack path --local-install-root --work-dir $workDir)/bin/cmt" # remove tokens
+
+tar -czvf "releases/$1/cmt-$1_x86-64-mac.tar.gz" --directory="$(stack path --local-install-root --work-dir $workDir)/bin" "cmt"
 
 
 # Linux
 stack docker pull
-stack build --docker --ghc-options -O3
+stack build --work-dir "$workDir" --docker --ghc-options -O3
 
-LINUX_DIR=$(ls .stack-work/install | grep linux)
+LINUX_FULL_PATH=$(find "$workDir" -path "*linux*" -and -path "*bin/cmt")
+LINUX_PATH=${LINUX_FULL_PATH%"cmt"}
 
-tar -czvf "releases/$1/cmt-$1_x86-64-linux.tar.gz" --directory=".stack-work/install/$LINUX_DIR/$resolver/$ghcv/bin" "cmt"
+strip "$LINUX_FULL_PATH" # remove tokens
+
+tar -czvf "releases/$1/cmt-$1_x86-64-linux.tar.gz"  --directory="$LINUX_PATH" "cmt"
 
 mkdir -p "releases/$1/cmt/DEBIAN"
 mkdir -p "releases/$1/cmt/usr/local/bin"
 
-cp ".stack-work/install/$LINUX_DIR/$resolver/$ghcv/bin/cmt" "releases/$1/cmt/usr/local/bin"
+cp "$LINUX_PATH/cmt" "releases/$1/cmt/usr/local/bin"
 
 echo "Package: cmt
 Version: $1
 Maintainer: Mark Wales
 Architecture: amd64
-Description: Finds cmten links in text files" > "releases/$1/cmt/DEBIAN/control"
+Description: Find cmten links in text documents" > "releases/$1/cmt/DEBIAN/control"
 
 docker run -v "$PWD/releases/$1":/usr/src/app -w /usr/src/app debian dpkg-deb --build cmt
 
@@ -63,11 +82,21 @@ rm -rf "releases/$1/cmt"
 open "releases/$1"
 open "https://github.com/smallhadroncollider/cmt/releases/new"
 
-echo "-
+echo "
+-
 
 ### Installation
 
 - Mac/Linux: download binary and place it in a directory in your \`\$PATH\` (e.g. \`/usr/local/bin\`)
-- Debian (including Ubuntu): download the \`.deb\` file and run \`dpkg -i cmt-$1_x86-64-linux.deb\`" | pbcopy
+- Debian (including Ubuntu): download the \`.deb\` file and run \`dpkg -i cmt-$1_x86-64-linux.deb\`. You may also need to install the \`libtinfo5\` package (\`sudo apt install libtinfo5\`)
+- Fedora: Run \`sudo dnf install ncurses-compat-libs\` then download and run binary as described above" | pbcopy
 
 echo "Release info copied to clipboard"
+
+
+# add to Hackage
+stack upload .
+
+
+# unstash
+git stash pop
