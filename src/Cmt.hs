@@ -10,7 +10,7 @@ import ClassyPrelude
 
 import Data.Text        (stripEnd)
 import System.Directory (removeFile)
-import System.Exit      (exitFailure, exitSuccess)
+import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
 
 import Cmt.IO.Config     (checkFormat, load, readCfg)
 import Cmt.IO.Git        (commit)
@@ -24,6 +24,7 @@ data Next
     | PreDefined Text
                  Outputs
     | Continue Outputs
+    | Version
 
 backup :: FilePath
 backup = ".cmt.bkp"
@@ -35,10 +36,10 @@ send :: Text -> IO ()
 send txt = do
     commited <- commit $ stripEnd txt
     case commited of
-        Right msg -> putStrLn msg >> exitSuccess
-        Left msg -> do
+        ExitSuccess -> exitSuccess
+        ExitFailure _ -> do
             writeFile backup (encodeUtf8 txt)
-            failure msg
+            exitFailure
 
 display :: Either Text (Config, Outputs) -> IO ()
 display (Left err) = putStrLn err
@@ -63,6 +64,7 @@ predef name output = do
                 Just cf -> display $ checkFormat output cf
 
 parseArgs :: [Text] -> Next
+parseArgs ["-v"]            = Version
 parseArgs ["--prev"]        = Previous
 parseArgs ["-p", name]      = PreDefined name []
 parseArgs ["-p", name, msg] = PreDefined name [("*", msg)]
@@ -78,3 +80,4 @@ go = do
         Continue output        -> readCfg output >>= display
         Previous               -> previous
         PreDefined name output -> predef name output
+        Version                -> putStrLn "0.6.0"
