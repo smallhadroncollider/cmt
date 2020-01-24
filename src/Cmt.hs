@@ -10,7 +10,7 @@ import ClassyPrelude
 
 import Data.Text        (stripEnd)
 import System.Directory (removeFile)
-import System.Exit      (exitFailure, exitSuccess)
+import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
 
 import Cmt.IO.Config     (checkFormat, load, readCfg)
 import Cmt.IO.Git        (commit)
@@ -35,10 +35,10 @@ send :: Text -> IO ()
 send txt = do
     commited <- commit $ stripEnd txt
     case commited of
-        Right msg -> putStrLn msg >> exitSuccess
-        Left msg -> do
+        ExitSuccess -> exitSuccess
+        ExitFailure _ -> do
             writeFile backup (encodeUtf8 txt)
-            failure msg
+            exitFailure
 
 display :: Either Text (Config, Outputs) -> IO ()
 display (Left err) = putStrLn err
