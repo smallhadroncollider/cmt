@@ -4,6 +4,7 @@
 
 module Cmt.IO.Config
     ( load
+    , findFile
     , readCfg
     , checkFormat
     ) where

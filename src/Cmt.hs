@@ -12,7 +12,7 @@ import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
 
-import Cmt.IO.Config     (checkFormat, load, readCfg)
+import Cmt.IO.Config     (checkFormat, findFile, load, readCfg)
 import Cmt.IO.Git        (commit)
 import Cmt.IO.Input      (loop)
 import Cmt.Output.Format (format)
@@ -25,6 +25,7 @@ data Next
                  Outputs
     | Continue Outputs
     | Version
+    | ConfigLocation
 
 backup :: FilePath
 backup = ".cmt.bkp"
@@ -63,8 +64,16 @@ predef name output = do
                 Nothing -> failure "No matching predefined message"
                 Just cf -> display $ checkFormat output cf
 
+configLocation :: IO ()
+configLocation = do
+    file <- findFile
+    case file of
+        Just path -> putStrLn (pack path)
+        Nothing   -> putStrLn ".cmt file not found"
+
 parseArgs :: [Text] -> Next
 parseArgs ["-v"]            = Version
+parseArgs ["-c"]            = ConfigLocation
 parseArgs ["--prev"]        = Previous
 parseArgs ["-p", name]      = PreDefined name []
 parseArgs ["-p", name, msg] = PreDefined name [("*", msg)]
@@ -73,11 +82,12 @@ parseArgs []                = Continue []
 parseArgs [msg]             = Continue [("*", msg)]
 parseArgs parts             = Continue [("*", unwords parts)]
 
+next :: Next -> IO ()
+next (Continue output)        = readCfg output >>= display
+next Previous                 = previous
+next (PreDefined name output) = predef name output
+next Version                  = putStrLn "0.6.0"
+next ConfigLocation           = configLocation
+
 go :: IO ()
-go = do
-    next <- parseArgs <$> getArgs
-    case next of
-        Continue output        -> readCfg output >>= display
-        Previous               -> previous
-        PreDefined name output -> predef name output
-        Version                -> putStrLn "0.6.0"
+go = next =<< parseArgs <$> getArgs
