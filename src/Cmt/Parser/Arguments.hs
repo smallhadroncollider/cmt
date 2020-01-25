@@ -1,4 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE TupleSections #-}
 
 module Cmt.Parser.Arguments
     ( parse
@@ -9,7 +11,25 @@ import ClassyPrelude
 import Data.Attoparsec.Text hiding (parse)
 
 import Cmt                   (Next (..))
-import Cmt.Parser.Attoparsec (lexeme)
+import Cmt.Parser.Attoparsec (lexeme, wordP)
+import Cmt.Types.Config (Outputs)
+
+outputsP :: Parser Outputs
+outputsP = lexeme $ do
+  message <- takeText
+  pure $ [("*", message)]
+
+emptyOutputsP :: Parser Outputs
+emptyOutputsP = endOfInput $> []
+
+continueP :: Parser Next
+continueP = Continue <$> (emptyOutputsP <|> outputsP)
+
+preDefinedP :: Parser Next
+preDefinedP = PreDefined <$> (string "-p" *> skipSpace *> wordP) <*> (emptyOutputsP <|> outputsP)
+
+previousP :: Parser Next
+previousP = string "--prev" $> Previous
 
 configLocationP :: Parser Next
 configLocationP = string "-c" $> ConfigLocation
@@ -21,7 +41,7 @@ helpP :: Parser Next
 helpP = string "-h" $> Help
 
 argumentsP :: Parser Next
-argumentsP = lexeme (helpP <|> versionP <|> configLocationP)
+argumentsP = lexeme (helpP <|> versionP <|> configLocationP <|> previousP <|> preDefinedP <|> continueP)
 
 -- run parser
 parse :: Text -> Next
