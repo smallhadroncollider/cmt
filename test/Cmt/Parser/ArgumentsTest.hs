@@ -1,15 +1,13 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedLists #-}
 
 module Cmt.Parser.ArgumentsTest where
 
--- import ClassyPrelude
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Cmt                  (Next (..))
 import Cmt.Parser.Arguments (parse)
+import Cmt.Types.Next       (Next (..))
 
 test_config :: TestTree
 test_config =
@@ -26,11 +24,15 @@ test_config =
               (assertEqual "Gives back PreDefined and name" (PreDefined "test" []) (parse "-p test"))
         , testCase
               "predefined message plus message"
-              (assertEqual "Gives back PreDefined, name and message" (PreDefined "test" [("*","a message")]) (parse "-p test a message"))
+              (assertEqual
+                   "Gives back PreDefined, name and message"
+                   (PreDefined "test" [("*", "a message")])
+                   (parse "-p test a message"))
+        , testCase "continue" (assertEqual "Gives back empty Continue" (Continue []) (parse ""))
         , testCase
               "continue"
-              (assertEqual "Gives back empty Continue" (Continue []) (parse ""))
-        , testCase
-              "continue"
-              (assertEqual "Gives back Continue with message" (Continue [("*", "a message")]) (parse "a message"))
+              (assertEqual
+                   "Gives back Continue with message"
+                   (Continue [("*", "a message")])
+                   (parse "a message"))
         ]

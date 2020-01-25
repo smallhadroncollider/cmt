@@ -10,14 +10,15 @@ import ClassyPrelude
 
 import Data.Attoparsec.Text hiding (parse)
 
-import Cmt                   (Next (..))
 import Cmt.Parser.Attoparsec (lexeme, wordP)
-import Cmt.Types.Config (Outputs)
+import Cmt.Types.Config      (Outputs)
+import Cmt.Types.Next        (Next (..))
 
 outputsP :: Parser Outputs
-outputsP = lexeme $ do
-  message <- takeText
-  pure $ [("*", message)]
+outputsP =
+    lexeme $ do
+        message <- takeText
+        pure $ [("*", message)]
 
 emptyOutputsP :: Parser Outputs
 emptyOutputsP = endOfInput $> []
@@ -41,7 +42,8 @@ helpP :: Parser Next
 helpP = string "-h" $> Help
 
 argumentsP :: Parser Next
-argumentsP = lexeme (helpP <|> versionP <|> configLocationP <|> previousP <|> preDefinedP <|> continueP)
+argumentsP =
+    lexeme (helpP <|> versionP <|> configLocationP <|> previousP <|> preDefinedP <|> continueP)
 
 -- run parser
 parse :: Text -> Next

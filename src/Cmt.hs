@@ -5,7 +5,6 @@
 
 module Cmt
     ( go
-    , Next(..)
     ) where
 
 import ClassyPrelude
@@ -15,23 +14,14 @@ import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
 
-import Cmt.IO.Config     (checkFormat, findFile, load, readCfg)
-import Cmt.IO.Git        (commit)
-import Cmt.IO.Input      (loop)
-import Cmt.Output.Format (format)
-import Cmt.Parser.Config (predefined)
-import Cmt.Types.Config  (Config, Outputs)
-
-data Next
-    = Previous
-    | PreDefined Text
-                 Outputs
-    | Continue Outputs
-    | Version
-    | ConfigLocation
-    | Help
-    | Error Text
-    deriving (Eq, Show)
+import Cmt.IO.Config        (checkFormat, findFile, load, readCfg)
+import Cmt.IO.Git           (commit)
+import Cmt.IO.Input         (loop)
+import Cmt.Output.Format    (format)
+import Cmt.Parser.Arguments (parse)
+import Cmt.Parser.Config    (predefined)
+import Cmt.Types.Config     (Config, Outputs)
+import Cmt.Types.Next       (Next (..))
 
 helpText :: Text
 helpText = decodeUtf8 $(embedFile "templates/usage.txt")
@@ -80,18 +70,6 @@ configLocation = do
         Just path -> putStrLn (pack path)
         Nothing   -> putStrLn ".cmt file not found"
 
-parseArgs :: [Text] -> Next
-parseArgs ["-h"]            = Help
-parseArgs ["-v"]            = Version
-parseArgs ["-c"]            = ConfigLocation
-parseArgs ["--prev"]        = Previous
-parseArgs ["-p", name]      = PreDefined name []
-parseArgs ["-p", name, msg] = PreDefined name [("*", msg)]
-parseArgs ("-p":name:parts) = PreDefined name [("*", unwords parts)]
-parseArgs []                = Continue []
-parseArgs [msg]             = Continue [("*", msg)]
-parseArgs parts             = Continue [("*", unwords parts)]
-
 next :: Next -> IO ()
 next (Continue output)        = readCfg output >>= display
 next Previous                 = previous
@@ -102,4 +80,4 @@ next Help                     = putStrLn helpText
 next (Error msg)              = failure msg
 
 go :: IO ()
-go = next =<< parseArgs <$> getArgs
+go = next =<< parse . unwords <$> getArgs
