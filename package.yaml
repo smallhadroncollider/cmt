@@ -8,6 +8,7 @@ copyright:           "Small Hadron Collider / Mark Wales"
 
 extra-source-files:
 - README.md
+- templates/usage.txt
 
 synopsis:            Write consistent git commit messages
 category:            Command Line Tools
@@ -24,10 +25,12 @@ dependencies:
 library:
   source-dirs: src
   dependencies:
+  - ansi-terminal
   - attoparsec
   - containers
   - text
   - directory
+  - file-embed
   - filepath
   - process
   - terminal-size
