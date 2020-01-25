@@ -182,12 +182,29 @@ If you're using the `${*}` format option then:
 cmt "blah blah blah" # this will go in ${*} place
 ```
 
-### Re-run Failed Commits
+### Dry Runs
 
-If the commit returns with a non-zero status code, your previous commit message is stored in a `.cmt.bkp` file. You can re-run the commit when you're ready with:
+If you add `--dry-run` as the first argument, `cmt` will show you the output, but not try and make a commit. It will store the output so you can easily run it without having to re-enter everything.
+
+```bash
+cmt --dry-run "Blah blah blah"
+cmt --dry-run -p vb
+```
+
+### Re-run Failed/Dry Run Commits
+
+If the commit returns with a non-zero status code or you run with `--dry-run`, your previous commit message is stored in a `.cmt.bkp` file. You can re-run the commit when you're ready with:
 
 ```bash
 cmt --prev
+```
+
+### Other Options
+
+```bash
+cmt -h # displays usage information
+cmt -v # displays version number
+cmt -c # displays location of .cmt file
 ```
 
 

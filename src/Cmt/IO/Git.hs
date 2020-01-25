@@ -12,12 +12,13 @@ import System.Exit    (ExitCode)
 import System.Process (readCreateProcessWithExitCode, shell, spawnCommand, waitForProcess)
 
 -- copied from https://hackage.haskell.org/package/posix-escape
+escapeChar :: Char -> String
+escapeChar '\0' = ""
+escapeChar '\'' = "'\"'\"'"
+escapeChar x    = [x]
+
 escape :: String -> String
-escape xs = "'" ++ concatMap f xs ++ "'"
-  where
-    f '\0' = ""
-    f '\'' = "'\"'\"'"
-    f x    = [x]
+escape xs = "'" ++ concatMap escapeChar xs ++ "'"
 
 commit :: Text -> IO ExitCode
 commit message = do

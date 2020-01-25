@@ -1,21 +1,24 @@
 ## Bugs
 
 - Multi-line is always optional
+- Multi-line always shows two entry inputs, even if first is empty
 - Should throw an error if no staged changes?
+- Remove `.cmt.bkp` on success `--prev`
 
 ## Features
 
-- List option?
-    > Automatically adds a hyphen to each entry?
-- Make parts optional
-    > @? and !@? operators?
 - Character limits
 - Line length limits
-- Descriptions alongside part name
+- Make parts optional
+    > @? and !@? operators?
+- List option?
+    > Automatically adds a hyphen to each entry?
 - Repeated sections
     > e.g. Co-Author: ${Name} ${Email}
 - Optional output bits
     > e.g. (${Scope}) shouldn't show brackets if no Scope provided
+- Descriptions alongside part name
+- Free-text option in option lists
 
 ## Doing
 
@@ -46,3 +49,7 @@
 - Should strip empty space/newlines from end of file
 - Way to store pre-written commits
     > Occasionally used messages: e.g. "version bump", "latest notes", etc.
+- Should pipe input out as it's happening
+- XDG Base Directory support for `.cmt` file
+- `--dry-run` option
+- Should throw an error if `.cmt.bkp` missing and using `--prev`

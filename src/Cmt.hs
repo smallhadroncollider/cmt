@@ -1,4 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedLists #-}
 
@@ -8,54 +9,75 @@ module Cmt
 
 import ClassyPrelude
 
+import Data.FileEmbed   (embedFile)
 import Data.Text        (stripEnd)
-import System.Directory (removeFile)
+import System.Directory (doesFileExist, removeFile)
 import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
 
-import Cmt.IO.Config     (checkFormat, load, readCfg)
-import Cmt.IO.Git        (commit)
-import Cmt.IO.Input      (loop)
-import Cmt.Output.Format (format)
-import Cmt.Parser.Config (predefined)
-import Cmt.Types.Config  (Config, Outputs)
+import Cmt.IO.CLI           (blank, errorMessage, header, mehssage, message)
+import Cmt.IO.Config        (checkFormat, findFile, load, readCfg)
+import Cmt.IO.Git           (commit)
+import Cmt.IO.Input         (loop)
+import Cmt.Output.Format    (format)
+import Cmt.Parser.Arguments (parse)
+import Cmt.Parser.Config    (predefined)
+import Cmt.Types.Config     (Config, Outputs)
+import Cmt.Types.Next       (Next (..))
 
-data Next
-    = Previous
-    | PreDefined Text
-                 Outputs
-    | Continue Outputs
-    | Version
+type App = ReaderT Bool IO ()
+
+helpText :: Text
+helpText = decodeUtf8 $(embedFile "templates/usage.txt")
 
 backup :: FilePath
 backup = ".cmt.bkp"
 
-failure :: Text -> IO ()
-failure msg = putStrLn msg >> exitFailure
+failure :: Text -> App
+failure msg = lift (errorMessage msg >> exitFailure)
 
-send :: Text -> IO ()
-send txt = do
-    commited <- commit $ stripEnd txt
+dryRun :: Text -> App
+dryRun txt =
+    lift $ do
+        header "Result"
+        blank
+        message txt
+        blank
+        writeFile backup (encodeUtf8 txt)
+        mehssage "run: cmt --prev to commit"
+        exitSuccess
+
+commitRun :: Text -> App
+commitRun txt = do
+    commited <- lift (commit $ stripEnd txt)
     case commited of
-        ExitSuccess -> exitSuccess
+        ExitSuccess -> lift exitSuccess
         ExitFailure _ -> do
             writeFile backup (encodeUtf8 txt)
-            exitFailure
+            lift exitFailure
 
-display :: Either Text (Config, Outputs) -> IO ()
+send :: Text -> App
+send txt = do
+    dry <- ask
+    bool commitRun dryRun dry txt
+
+display :: Either Text (Config, Outputs) -> App
 display (Left err) = putStrLn err
 display (Right (cfg, output)) = do
-    parts <- loop cfg
+    parts <- lift $ loop cfg
     send $ format cfg (output ++ parts)
 
-previous :: IO ()
+previous :: App
 previous = do
-    txt <- decodeUtf8 <$> readFile backup
-    removeFile backup
-    send txt
+    exists <- lift $ doesFileExist backup
+    if exists
+        then (do txt <- decodeUtf8 <$> readFile backup
+                 lift $ removeFile backup
+                 send txt)
+        else (failure "No previous commit attempts")
 
-predef :: Text -> Outputs -> IO ()
+predef :: Text -> Outputs -> App
 predef name output = do
-    cfg <- load
+    cfg <- lift load
     case predefined =<< cfg of
         Left msg -> failure msg
         Right pre ->
@@ -63,21 +85,26 @@ predef name output = do
                 Nothing -> failure "No matching predefined message"
                 Just cf -> display $ checkFormat output cf
 
-parseArgs :: [Text] -> Next
-parseArgs ["-v"]            = Version
-parseArgs ["--prev"]        = Previous
-parseArgs ["-p", name]      = PreDefined name []
-parseArgs ["-p", name, msg] = PreDefined name [("*", msg)]
-parseArgs ("-p":name:parts) = PreDefined name [("*", unwords parts)]
-parseArgs []                = Continue []
-parseArgs [msg]             = Continue [("*", msg)]
-parseArgs parts             = Continue [("*", unwords parts)]
+configLocation :: App
+configLocation = do
+    file <- lift findFile
+    case file of
+        Just path -> putStrLn (pack path)
+        Nothing   -> failure ".cmt file not found"
+
+next :: Next -> App
+next (Continue output)        = lift (readCfg output) >>= display
+next Previous                 = previous
+next (PreDefined name output) = predef name output
+next Version                  = putStrLn "0.7.0"
+next ConfigLocation           = configLocation
+next Help                     = putStrLn helpText
+next (Error msg)              = failure msg
+next (DryRun nxt)             = next nxt
 
 go :: IO ()
 go = do
-    next <- parseArgs <$> getArgs
-    case next of
-        Continue output        -> readCfg output >>= display
-        Previous               -> previous
-        PreDefined name output -> predef name output
-        Version                -> putStrLn "0.6.0"
+    nxt <- parse . unwords <$> getArgs
+    case nxt of
+        (DryRun n) -> runReaderT (next n) True
+        _          -> runReaderT (next nxt) False

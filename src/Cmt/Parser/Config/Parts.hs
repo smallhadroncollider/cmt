@@ -30,7 +30,7 @@ listP = Options <$> (char '[' *> many' listItemP <* char ']')
 
 -- name
 nameP :: Parser Text
-nameP = char '"' *> word <* char '"' <* lexeme (char '=')
+nameP = char '"' *> wordsP <* char '"' <* lexeme (char '=')
 
 -- part
 partP :: Parser Part

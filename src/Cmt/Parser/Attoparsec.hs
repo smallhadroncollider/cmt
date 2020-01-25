@@ -26,8 +26,14 @@ commentP = lexeme $ skipMany (char '#' *> manyTill anyChar endOfLine)
 stripComments :: Parser a -> Parser a
 stripComments p = lexeme $ commentP *> p <* commentP
 
-word :: Parser Text
-word = pack <$> many1 (letter <|> space)
+wordP :: Parser Text
+wordP = pack <$> many1 (letter <|> digit)
+
+wordsP :: Parser Text
+wordsP = pack <$> many1 (letter <|> space)
 
 valid :: [Name] -> Parser Text
 valid names = choice $ "*" : (string <$> names)
+
+ifP :: Parser () -> Parser Bool
+ifP p = option False (p $> True)

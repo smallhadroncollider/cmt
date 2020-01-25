@@ -1,0 +1,9 @@
+Usage: cmt [--dry-run] [message]
+
+Options:
+
+-h              Display this help message
+-c              Display location of .cmt file
+-v              Display version number
+--dry-run       Displays the commit message without committing
+--prev          Runs previous attempt after failure/dry run
