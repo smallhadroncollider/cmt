@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE TupleSections #-}
 
 module Cmt.Parser.Arguments
     ( parse
@@ -14,24 +15,17 @@ import Cmt.Parser.Attoparsec (lexeme, wordP)
 import Cmt.Types.Config (Outputs)
 
 outputsP :: Parser Outputs
-outputsP = do
-  _ <- skipSpace
+outputsP = lexeme $ do
   message <- takeText
   pure $ [("*", message)]
 
 emptyOutputsP :: Parser Outputs
-emptyOutputsP = do
-  _ <- endOfInput
-  pure $ []
+emptyOutputsP = endOfInput $> []
 
 preDefinedP :: Parser Next
-preDefinedP = do
-  _ <- string "-p"
-  _ <- skipSpace
-  name <- wordP
-  outputs <- (emptyOutputsP <|> outputsP)
-  pure $ PreDefined name outputs
+preDefinedP = PreDefined <$> (string "-p" *> skipSpace *> wordP) <*> (emptyOutputsP <|> outputsP)
 
+previousP :: Parser Next
 previousP = string "--prev" $> Previous
 
 configLocationP :: Parser Next
