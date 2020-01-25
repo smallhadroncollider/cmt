@@ -5,8 +5,9 @@ module Cmt.Parser.Config.PreDefined
     ( predefinedPartsP
     ) where
 
-import ClassyPrelude
+import ClassyPrelude hiding (fail)
 
+import Control.Monad.Fail   (fail)
 import Data.Attoparsec.Text
 
 import Cmt.Parser.Attoparsec
