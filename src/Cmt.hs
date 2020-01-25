@@ -5,6 +5,7 @@
 
 module Cmt
     ( go
+    , Next(..)
     ) where
 
 import ClassyPrelude
@@ -29,6 +30,8 @@ data Next
     | Version
     | ConfigLocation
     | Help
+    | Error Text
+    deriving (Eq, Show)
 
 helpText :: Text
 helpText = decodeUtf8 $(embedFile "templates/usage.txt")
@@ -96,6 +99,7 @@ next (PreDefined name output) = predef name output
 next Version                  = putStrLn "0.6.0"
 next ConfigLocation           = configLocation
 next Help                     = putStrLn helpText
+next (Error msg)              = failure msg
 
 go :: IO ()
 go = next =<< parseArgs <$> getArgs
