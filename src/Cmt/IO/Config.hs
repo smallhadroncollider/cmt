@@ -16,6 +16,7 @@ import System.FilePath  (takeDirectory, (</>))
 
 import Cmt.Parser.Config (config)
 import Cmt.Types.Config
+import Cmt.Utility       ((<?>))
 
 configFile :: FilePath
 configFile = ".cmt"
@@ -52,22 +53,30 @@ checkDir path = do
         then pure $ Just fp
         else checkParent path
 
-homeDir :: IO (Maybe FilePath)
-homeDir = do
-    home <- getHomeDirectory
-    let fp = home </> configFile
+xdgCfg :: IO (Maybe FilePath)
+xdgCfg = do
+    fp <- (</> ".config" </> "cmt" </> configFile) <$> getHomeDirectory
     exists <- doesFileExist fp
-    pure $
-        if exists
-            then Just fp
-            else Nothing
+    pure $ bool Nothing (Just fp) exists
+
+homeCfg :: IO (Maybe FilePath)
+homeCfg = do
+    fp <- (</> configFile) <$> getHomeDirectory
+    exists <- doesFileExist fp
+    pure $ bool Nothing (Just fp) exists
+
+globalCfg :: IO (Maybe FilePath)
+globalCfg = do
+    xdg <- xdgCfg
+    home <- homeCfg
+    pure $ xdg <?> home
 
 findFile :: IO (Maybe FilePath)
 findFile = do
     inDir <- checkDir =<< getCurrentDirectory
     case inDir of
         Just fp -> pure $ Just fp
-        Nothing -> homeDir
+        Nothing -> globalCfg
 
 load :: IO (Either Text Text)
 load = do
