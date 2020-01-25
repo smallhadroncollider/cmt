@@ -190,6 +190,14 @@ If the commit returns with a non-zero status code, your previous commit message 
 cmt --prev
 ```
 
+### Other Options
+
+```bash
+cmt -h # displays usage information
+cmt -v # displays version number
+cmt -c # displays location of .cmt file
+```
+
 
 ## Install
 
