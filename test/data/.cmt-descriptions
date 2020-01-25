@@ -1,0 +1,36 @@
+# Input parts
+{
+    # items with descriptions
+    {"Type", "What sort of change?"} = [
+        {"feat", "A feature"},
+        {"fix", "A fix"},
+        {"docs", "The docs"},
+        {"style", "Style changes"},
+        {"refactor", "A refactoring"},
+        {"test", "Tests"},
+        {"chore", "Boring stuff"},
+        {@, "Other"} # free-text option
+    ]
+
+    # repeated input
+    [
+        "Co-Author Name": @
+        "Co-Author Email": @
+    ]
+
+    # description
+    {"Scope", "What's changed?"} = %
+
+    # limit to 50 characters
+    "Short Message" = @[50]
+
+    # limit each line to 72 characters
+    "Body" = !@[72]
+}
+
+# Output format
+${Type} (${Scope}): ${Short Message}
+
+$[Co-Author: ${Co-Author Name} ${Co-Author Email}]
+
+${Body}
