@@ -96,7 +96,7 @@ next :: Next -> App
 next (Continue output)        = lift (readCfg output) >>= display
 next Previous                 = previous
 next (PreDefined name output) = predef name output
-next Version                  = putStrLn "0.6.0"
+next Version                  = putStrLn "0.7.0"
 next ConfigLocation           = configLocation
 next Help                     = putStrLn helpText
 next (Error msg)              = failure msg
