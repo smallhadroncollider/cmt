@@ -10,16 +10,28 @@ import ClassyPrelude
 import Data.Attoparsec.Text hiding (parse)
 
 import Cmt                   (Next (..))
-import Cmt.Parser.Attoparsec (lexeme, word)
+import Cmt.Parser.Attoparsec (lexeme, wordP)
+import Cmt.Types.Config (Outputs)
+
+outputsP :: Parser Outputs
+outputsP = do
+  _ <- skipSpace
+  message <- takeText
+  pure $ [("*", message)]
+
+emptyOutputsP :: Parser Outputs
+emptyOutputsP = do
+  _ <- endOfInput
+  pure $ []
 
 preDefinedP :: Parser Next
 preDefinedP = do
   _ <- string "-p"
   _ <- skipSpace
-  name <- word
-  pure $ PreDefined name []
+  name <- wordP
+  outputs <- (emptyOutputsP <|> outputsP)
+  pure $ PreDefined name outputs
 
-previousP :: Parser Next
 previousP = string "--prev" $> Previous
 
 configLocationP :: Parser Next
