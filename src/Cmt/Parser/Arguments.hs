@@ -10,7 +10,7 @@ import ClassyPrelude
 
 import Data.Attoparsec.Text hiding (parse)
 
-import Cmt.Parser.Attoparsec (lexeme, wordP)
+import Cmt.Parser.Attoparsec (ifP, lexeme, wordP)
 import Cmt.Types.Config      (Outputs)
 import Cmt.Types.Next        (Next (..))
 
@@ -41,9 +41,17 @@ versionP = string "-v" $> Version
 helpP :: Parser Next
 helpP = string "-h" $> Help
 
+dryRunP :: Parser Next -> Parser Next
+dryRunP p = do
+    dry <- ifP (string "--dry-run" *> skipSpace)
+    next <- p
+    pure $ bool next (DryRun next) dry
+
 argumentsP :: Parser Next
 argumentsP =
-    lexeme (helpP <|> versionP <|> configLocationP <|> previousP <|> preDefinedP <|> continueP)
+    lexeme
+        (helpP <|> versionP <|> configLocationP <|>
+         dryRunP (previousP <|> preDefinedP <|> continueP))
 
 -- run parser
 parse :: Text -> Next

@@ -14,6 +14,7 @@ import Data.Text        (stripEnd)
 import System.Directory (removeFile)
 import System.Exit      (ExitCode (..), exitFailure, exitSuccess)
 
+import Cmt.IO.CLI           (blank, errorMessage, header, mehssage, message)
 import Cmt.IO.Config        (checkFormat, findFile, load, readCfg)
 import Cmt.IO.Git           (commit)
 import Cmt.IO.Input         (loop)
@@ -23,39 +24,57 @@ import Cmt.Parser.Config    (predefined)
 import Cmt.Types.Config     (Config, Outputs)
 import Cmt.Types.Next       (Next (..))
 
+type App = ReaderT Bool IO ()
+
 helpText :: Text
 helpText = decodeUtf8 $(embedFile "templates/usage.txt")
 
 backup :: FilePath
 backup = ".cmt.bkp"
 
-failure :: Text -> IO ()
-failure msg = putStrLn msg >> exitFailure
+failure :: Text -> App
+failure msg = lift (errorMessage msg >> exitFailure)
 
-send :: Text -> IO ()
-send txt = do
-    commited <- commit $ stripEnd txt
+dryRun :: Text -> App
+dryRun txt =
+    lift $ do
+        header "Result"
+        blank
+        message txt
+        blank
+        writeFile backup (encodeUtf8 txt)
+        mehssage "run: cmt --prev to commit"
+        exitSuccess
+
+commitRun :: Text -> App
+commitRun txt = do
+    commited <- lift (commit $ stripEnd txt)
     case commited of
-        ExitSuccess -> exitSuccess
+        ExitSuccess -> lift exitSuccess
         ExitFailure _ -> do
             writeFile backup (encodeUtf8 txt)
-            exitFailure
+            lift exitFailure
 
-display :: Either Text (Config, Outputs) -> IO ()
+send :: Text -> App
+send txt = do
+    dry <- ask
+    bool commitRun dryRun dry txt
+
+display :: Either Text (Config, Outputs) -> App
 display (Left err) = putStrLn err
 display (Right (cfg, output)) = do
-    parts <- loop cfg
+    parts <- lift $ loop cfg
     send $ format cfg (output ++ parts)
 
-previous :: IO ()
+previous :: App
 previous = do
     txt <- decodeUtf8 <$> readFile backup
-    removeFile backup
+    lift $ removeFile backup
     send txt
 
-predef :: Text -> Outputs -> IO ()
+predef :: Text -> Outputs -> App
 predef name output = do
-    cfg <- load
+    cfg <- lift load
     case predefined =<< cfg of
         Left msg -> failure msg
         Right pre ->
@@ -63,21 +82,26 @@ predef name output = do
                 Nothing -> failure "No matching predefined message"
                 Just cf -> display $ checkFormat output cf
 
-configLocation :: IO ()
+configLocation :: App
 configLocation = do
-    file <- findFile
+    file <- lift findFile
     case file of
         Just path -> putStrLn (pack path)
-        Nothing   -> putStrLn ".cmt file not found"
+        Nothing   -> failure ".cmt file not found"
 
-next :: Next -> IO ()
-next (Continue output)        = readCfg output >>= display
+next :: Next -> App
+next (Continue output)        = lift (readCfg output) >>= display
 next Previous                 = previous
 next (PreDefined name output) = predef name output
 next Version                  = putStrLn "0.6.0"
 next ConfigLocation           = configLocation
 next Help                     = putStrLn helpText
 next (Error msg)              = failure msg
+next (DryRun nxt)             = next nxt
 
 go :: IO ()
-go = next =<< parse . unwords <$> getArgs
+go = do
+    nxt <- parse . unwords <$> getArgs
+    case nxt of
+        (DryRun n) -> runReaderT (next n) True
+        _          -> runReaderT (next nxt) False

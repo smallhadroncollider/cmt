@@ -34,3 +34,6 @@ wordsP = pack <$> many1 (letter <|> space)
 
 valid :: [Name] -> Parser Text
 valid names = choice $ "*" : (string <$> names)
+
+ifP :: Parser () -> Parser Bool
+ifP p = option False (p $> True)
