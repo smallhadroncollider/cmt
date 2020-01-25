@@ -1,5 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLists #-}
 
 module Cmt.Parser.ArgumentsTest where
 
@@ -19,6 +20,10 @@ test_config =
         , testCase
               "config location"
               (assertEqual "Gives back ConfigLocation" ConfigLocation (parse "-c"))
+        , testCase "previous" (assertEqual "Gives back Previous" Previous (parse "--prev"))
+        , testCase
+              "predefined message"
+              (assertEqual "Gives back PreDefined and name" (PreDefined "test" []) (parse "-p test"))
         , testCase
               "parse error"
               (assertEqual "Gives an error" (Error "Could not parse arguments") (parse "-q"))
