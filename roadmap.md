@@ -7,6 +7,8 @@
 
 ## Features
 
+- Character limits
+- Line length limits
 - Make parts optional
     > @? and !@? operators?
 - List option?
@@ -15,14 +17,11 @@
     > e.g. Co-Author: ${Name} ${Email}
 - Optional output bits
     > e.g. (${Scope}) shouldn't show brackets if no Scope provided
-- Dry-run option
+- Descriptions alongside part name
+- Free-text option in option lists
 
 ## Doing
 
-- Character limits
-- Line length limits
-- Descriptions alongside part name
-- Free-text option in option lists
 
 ## Done
 
@@ -52,3 +51,4 @@
     > Occasionally used messages: e.g. "version bump", "latest notes", etc.
 - Should pipe input out as it's happening
 - XDG Base Directory support for `.cmt` file
+- `--dry-run` option
