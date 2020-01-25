@@ -22,6 +22,9 @@ outputsP = lexeme $ do
 emptyOutputsP :: Parser Outputs
 emptyOutputsP = endOfInput $> []
 
+continueP :: Parser Next
+continueP = Continue <$> (emptyOutputsP <|> outputsP)
+
 preDefinedP :: Parser Next
 preDefinedP = PreDefined <$> (string "-p" *> skipSpace *> wordP) <*> (emptyOutputsP <|> outputsP)
 
@@ -38,7 +41,7 @@ helpP :: Parser Next
 helpP = string "-h" $> Help
 
 argumentsP :: Parser Next
-argumentsP = lexeme (helpP <|> versionP <|> configLocationP <|> previousP <|> preDefinedP)
+argumentsP = lexeme (helpP <|> versionP <|> configLocationP <|> previousP <|> preDefinedP <|> continueP)
 
 -- run parser
 parse :: Text -> Next

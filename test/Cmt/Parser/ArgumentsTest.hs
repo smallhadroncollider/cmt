@@ -28,6 +28,9 @@ test_config =
               "predefined message plus message"
               (assertEqual "Gives back PreDefined, name and message" (PreDefined "test" [("*","a message")]) (parse "-p test a message"))
         , testCase
-              "parse error"
-              (assertEqual "Gives an error" (Error "Could not parse arguments") (parse "-q"))
+              "continue"
+              (assertEqual "Gives back empty Continue" (Continue []) (parse ""))
+        , testCase
+              "continue"
+              (assertEqual "Gives back Continue with message" (Continue [("*", "a message")]) (parse "a message"))
         ]
