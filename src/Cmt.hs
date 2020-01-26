@@ -21,10 +21,9 @@ import Cmt.IO.Input         (loop)
 import Cmt.Output.Format    (format)
 import Cmt.Parser.Arguments (parse)
 import Cmt.Parser.Config    (predefined)
+import Cmt.Types.App        (App, settingsDryRun)
 import Cmt.Types.Config     (Config, Outputs)
 import Cmt.Types.Next       (Next (..))
-
-type App = ReaderT Bool IO ()
 
 helpText :: Text
 helpText = decodeUtf8 $(embedFile "templates/usage.txt")
@@ -57,7 +56,7 @@ commitRun txt = do
 
 send :: Text -> App
 send txt = do
-    dry <- ask
+    dry <- asks settingsDryRun
     bool commitRun dryRun dry txt
 
 display :: Either Text (Config, Outputs) -> App
@@ -99,12 +98,10 @@ next (PreDefined name output) = predef name output
 next Version                  = putStrLn "0.7.0"
 next ConfigLocation           = configLocation
 next Help                     = putStrLn helpText
-next (Error msg)              = failure msg
-next (DryRun nxt)             = next nxt
 
 go :: IO ()
 go = do
-    nxt <- parse . unwords <$> getArgs
-    case nxt of
-        (DryRun n) -> runReaderT (next n) True
-        _          -> runReaderT (next nxt) False
+    ready <- parse . unwords <$> getArgs
+    case ready of
+        Right (settings, nxt) -> runReaderT (next nxt) settings
+        Left err              -> errorMessage err >> exitFailure
