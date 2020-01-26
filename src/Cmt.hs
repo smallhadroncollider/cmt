@@ -32,18 +32,17 @@ backup :: FilePath
 backup = ".cmt.bkp"
 
 failure :: Text -> App
-failure msg = lift (errorMessage msg >> exitFailure)
+failure msg = errorMessage msg >> lift exitFailure
 
 dryRun :: Text -> App
-dryRun txt =
-    lift $ do
-        header "Result"
-        blank
-        message txt
-        blank
-        writeFile backup (encodeUtf8 txt)
-        mehssage "run: cmt --prev to commit"
-        exitSuccess
+dryRun txt = do
+    header "Result"
+    blank
+    message txt
+    blank
+    lift $ writeFile backup (encodeUtf8 txt)
+    mehssage "run: cmt --prev to commit"
+    lift $ exitSuccess
 
 commitRun :: Text -> App
 commitRun txt = do
@@ -104,4 +103,4 @@ go = do
     ready <- parse . unwords <$> getArgs
     case ready of
         Right (settings, nxt) -> runReaderT (next nxt) settings
-        Left err              -> errorMessage err >> exitFailure
+        Left err              -> putStrLn err >> exitFailure

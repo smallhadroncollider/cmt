@@ -43,8 +43,9 @@ helpP = string "-h" $> Help
 settingsP :: Parser Next -> Parser (Settings, Next)
 settingsP p = do
     dry <- ifP (string "--dry-run" *> skipSpace)
+    colour <- not <$> ifP (string "--no-color" *> skipSpace)
     next <- p
-    let settings = Settings dry True
+    let settings = Settings dry colour
     pure (settings, next)
 
 argumentsP :: Parser (Settings, Next)

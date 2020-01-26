@@ -1,9 +1,13 @@
-Usage: cmt [--dry-run] [message]
+Usage: cmt [--dry-run] [--no-color] [options | message]
+
+Settings:
+
+--dry-run       Displays the commit message without committing
+--no-color      Don't use bash colour codes in output
 
 Options:
 
 -h              Display this help message
 -c              Display location of .cmt file
 -v              Display version number
---dry-run       Displays the commit message without committing
 --prev          Runs previous attempt after failure/dry run

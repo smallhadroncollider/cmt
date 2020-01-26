@@ -53,3 +53,4 @@
 - XDG Base Directory support for `.cmt` file
 - `--dry-run` option
 - Should throw an error if `.cmt.bkp` missing and using `--prev`
+- `--no-color option`

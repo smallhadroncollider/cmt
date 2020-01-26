@@ -89,5 +89,11 @@ test_config =
                          "Gives back Continue with message"
                          (Right (Settings True True, Continue [("*", "a message")]))
                          (parse "--dry-run a message"))
+              , testCase
+                    "predefined message plus message - no colours"
+                    (assertEqual
+                         "Gives back PreDefined, name and message"
+                         (Right (Settings False False, PreDefined "test" [("*", "a message")]))
+                         (parse "--no-color -p test a message"))
               ]
         ]

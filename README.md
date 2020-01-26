@@ -199,6 +199,11 @@ If the commit returns with a non-zero status code or you run with `--dry-run`, y
 cmt --prev
 ```
 
+### Colour Output
+
+By default the output uses bash colour codes. You can turn this off using the `--no-color` setting.
+
+
 ### Other Options
 
 ```bash
