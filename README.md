@@ -9,7 +9,7 @@ Similar idea to [commitizen](https://github.com/commitizen/cz-cli), but with an 
 - [Usage](#Usage)
 - [Install](#Install)
 
-![Demo](https://files.smallhadroncollider.com/cmt-0.4.gif)
+![Demo](https://files.smallhadroncollider.com/cmt-0.7.gif)
 
 
 ## Concept

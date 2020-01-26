@@ -54,3 +54,4 @@
 - `--dry-run` option
 - Should throw an error if `.cmt.bkp` missing and using `--prev`
 - `--no-color option`
+- New screencast
