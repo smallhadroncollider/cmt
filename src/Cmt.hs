@@ -21,10 +21,9 @@ import Cmt.IO.Input         (loop)
 import Cmt.Output.Format    (format)
 import Cmt.Parser.Arguments (parse)
 import Cmt.Parser.Config    (predefined)
+import Cmt.Types.App        (App, settingsDryRun)
 import Cmt.Types.Config     (Config, Outputs)
 import Cmt.Types.Next       (Next (..))
-
-type App = ReaderT Bool IO ()
 
 helpText :: Text
 helpText = decodeUtf8 $(embedFile "templates/usage.txt")
@@ -33,18 +32,17 @@ backup :: FilePath
 backup = ".cmt.bkp"
 
 failure :: Text -> App
-failure msg = lift (errorMessage msg >> exitFailure)
+failure msg = errorMessage msg >> lift exitFailure
 
 dryRun :: Text -> App
-dryRun txt =
-    lift $ do
-        header "Result"
-        blank
-        message txt
-        blank
-        writeFile backup (encodeUtf8 txt)
-        mehssage "run: cmt --prev to commit"
-        exitSuccess
+dryRun txt = do
+    header "Result"
+    blank
+    message txt
+    blank
+    lift $ writeFile backup (encodeUtf8 txt)
+    mehssage "run: cmt --prev to commit"
+    lift $ exitSuccess
 
 commitRun :: Text -> App
 commitRun txt = do
@@ -57,7 +55,7 @@ commitRun txt = do
 
 send :: Text -> App
 send txt = do
-    dry <- ask
+    dry <- asks settingsDryRun
     bool commitRun dryRun dry txt
 
 display :: Either Text (Config, Outputs) -> App
@@ -96,15 +94,13 @@ next :: Next -> App
 next (Continue output)        = lift (readCfg output) >>= display
 next Previous                 = previous
 next (PreDefined name output) = predef name output
-next Version                  = putStrLn "0.7.0"
+next Version                  = putStrLn "0.7.1"
 next ConfigLocation           = configLocation
 next Help                     = putStrLn helpText
-next (Error msg)              = failure msg
-next (DryRun nxt)             = next nxt
 
 go :: IO ()
 go = do
-    nxt <- parse . unwords <$> getArgs
-    case nxt of
-        (DryRun n) -> runReaderT (next n) True
-        _          -> runReaderT (next nxt) False
+    ready <- parse . unwords <$> getArgs
+    case ready of
+        Right (settings, nxt) -> runReaderT (next nxt) settings
+        Left err              -> putStrLn err >> exitFailure

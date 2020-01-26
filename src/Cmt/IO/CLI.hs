@@ -1,7 +1,13 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Cmt.IO.CLI where
+module Cmt.IO.CLI
+    ( blank
+    , message
+    , mehssage
+    , header
+    , errorMessage
+    ) where
 
 import ClassyPrelude
 
@@ -9,29 +15,36 @@ import Data.Text.IO        (hPutStrLn)
 import System.Console.ANSI (Color (Blue, Magenta, Red, Yellow), ColorIntensity (Dull),
                             ConsoleLayer (Foreground), SGR (Reset, SetColor), hSetSGR)
 
-blank :: IO ()
+import Cmt.Types.App (App, settingsColourize)
+
+setSGR :: Handle -> [SGR] -> App
+setSGR hndl settings = do
+    colourize <- asks settingsColourize
+    when colourize $ lift (hSetSGR hndl settings)
+
+blank :: App
 blank = putStrLn ""
 
-message :: Text -> IO ()
+message :: Text -> App
 message msg = do
-    hSetSGR stdout [SetColor Foreground Dull Blue]
-    hPutStrLn stdout msg
-    hSetSGR stdout [Reset]
+    setSGR stdout [SetColor Foreground Dull Blue]
+    putStrLn msg
+    setSGR stdout [Reset]
 
-mehssage :: Text -> IO ()
+mehssage :: Text -> App
 mehssage msg = do
-    hSetSGR stdout [SetColor Foreground Dull Yellow]
-    hPutStrLn stdout msg
-    hSetSGR stdout [Reset]
+    setSGR stdout [SetColor Foreground Dull Yellow]
+    putStrLn msg
+    setSGR stdout [Reset]
 
-header :: Text -> IO ()
+header :: Text -> App
 header msg = do
-    hSetSGR stdout [SetColor Foreground Dull Magenta]
-    hPutStrLn stdout $ "*** " ++ msg ++ " ***"
-    hSetSGR stdout [Reset]
+    setSGR stdout [SetColor Foreground Dull Magenta]
+    putStrLn $ "*** " ++ msg ++ " ***"
+    setSGR stdout [Reset]
 
-errorMessage :: Text -> IO ()
+errorMessage :: Text -> App
 errorMessage msg = do
-    hSetSGR stderr [SetColor Foreground Dull Red]
-    hPutStrLn stderr msg
-    hSetSGR stderr [Reset]
+    setSGR stderr [SetColor Foreground Dull Red]
+    lift $ hPutStrLn stderr msg
+    setSGR stderr [Reset]

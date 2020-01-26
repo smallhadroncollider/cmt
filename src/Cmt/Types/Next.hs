@@ -16,6 +16,4 @@ data Next
     | Version
     | ConfigLocation
     | Help
-    | Error Text
-    | DryRun Next
     deriving (Eq, Show)

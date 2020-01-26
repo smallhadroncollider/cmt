@@ -1,6 +1,4 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE TupleSections #-}
 
 module Cmt.Parser.Arguments
     ( parse
@@ -11,6 +9,7 @@ import ClassyPrelude
 import Data.Attoparsec.Text hiding (parse)
 
 import Cmt.Parser.Attoparsec (ifP, lexeme, wordP)
+import Cmt.Types.App         (Settings (Settings))
 import Cmt.Types.Config      (Outputs)
 import Cmt.Types.Next        (Next (..))
 
@@ -41,21 +40,22 @@ versionP = string "-v" $> Version
 helpP :: Parser Next
 helpP = string "-h" $> Help
 
-dryRunP :: Parser Next -> Parser Next
-dryRunP p = do
+settingsP :: Parser Next -> Parser (Settings, Next)
+settingsP p = do
     dry <- ifP (string "--dry-run" *> skipSpace)
+    colour <- not <$> ifP (string "--no-color" *> skipSpace)
     next <- p
-    pure $ bool next (DryRun next) dry
+    let settings = Settings dry colour
+    pure (settings, next)
 
-argumentsP :: Parser Next
+argumentsP :: Parser (Settings, Next)
 argumentsP =
-    lexeme
-        (helpP <|> versionP <|> configLocationP <|>
-         dryRunP (previousP <|> preDefinedP <|> continueP))
+    lexeme $
+    settingsP (helpP <|> versionP <|> configLocationP <|> previousP <|> preDefinedP <|> continueP)
 
 -- run parser
-parse :: Text -> Next
+parse :: Text -> Either Text (Settings, Next)
 parse arguments =
     case parseOnly argumentsP arguments of
-        Right c -> c
-        Left _  -> Error "Could not parse arguments"
+        Right c -> Right c
+        Left _  -> Left "Could not parse arguments"
