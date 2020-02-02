@@ -97,6 +97,9 @@ echo "Release info copied to clipboard"
 # add to Hackage
 stack upload .
 
+# Homebrew Pull Request
+brew update
+brew bump-formula-pr --url="https://github.com/smallhadroncollider/cmt/archive/$1.tar.gz" cmt
 
 # unstash
 git stash pop
