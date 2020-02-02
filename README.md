@@ -215,6 +215,21 @@ cmt -c # displays location of .cmt file
 
 ## Install
 
+### Homebrew (Mac)
+
+You can install `cmt` on your Mac using [Homebrew](https://brew.sh):
+
+```bash
+brew install cmt
+```
+
+### Debian/Ubuntu
+
+[A `.deb` package is available for Debian/Ubuntu](https://github.com/smallhadroncollider/cmt/releases). Download it and install with `dpkg -i <package-name>`.
+
+
+### Binaries
+
 [Binaries for Mac and Linux are available](https://github.com/smallhadroncollider/cmt/releases). Add the binary to a directory in your path (such as `/usr/local/bin`).
 
 ### Cabal
@@ -225,7 +240,7 @@ cmt -c # displays location of .cmt file
 cabal install cmt
 ```
 
-Make sure you run `cabal update` if you haven't run it recently.
+Make sure you run `cabal update` first if you haven't run it recently.
 
 ### Building
 
