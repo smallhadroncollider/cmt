@@ -4,9 +4,12 @@
 module Cmt.IO.Git
     ( commit
     , changed
+    , branch
     ) where
 
 import ClassyPrelude
+
+import Data.Text (strip)
 
 import System.Exit    (ExitCode)
 import System.Process (readCreateProcessWithExitCode, shell, spawnCommand, waitForProcess)
@@ -19,6 +22,12 @@ escapeChar x    = [x]
 
 escape :: String -> String
 escape xs = "'" ++ concatMap escapeChar xs ++ "'"
+
+branch :: IO Text
+branch = do
+    let msg = "git rev-parse --abbrev-ref HEAD"
+    (_, out, _) <- readCreateProcessWithExitCode (shell msg) ""
+    pure . strip $ pack out
 
 commit :: Text -> IO ExitCode
 commit message = do
