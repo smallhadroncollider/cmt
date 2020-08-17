@@ -5,10 +5,15 @@ module Cmt.Types.Config where
 import ClassyPrelude   (Eq, Maybe (..), Show, Text)
 import Data.Map.Strict (Map)
 
+data BranchName
+    = Full Text
+    | Prefix Text
+    deriving (Show, Eq)
+
 data Branches
     = Any
-    | Deny [Text]
-    | Allow [Text]
+    | Deny [BranchName]
+    | Allow [BranchName]
     deriving (Show, Eq)
 
 type Output = (Name, Text)

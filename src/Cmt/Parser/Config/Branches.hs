@@ -10,15 +10,18 @@ import ClassyPrelude
 import Data.Attoparsec.Text
 
 import Cmt.Parser.Attoparsec
-import Cmt.Types.Config      (Branches (..))
+import Cmt.Types.Config      (BranchName (..), Branches (..))
 
 charP :: Parser Char
-charP = digit <|> letter <|> choice (char <$> "-_/*")
+charP = digit <|> letter <|> choice (char <$> "-_/")
 
-nameP :: Parser Text
-nameP = pack <$> many1 charP
+nameP :: Parser BranchName
+nameP = do
+    name <- pack <$> many1 charP
+    typ <- bool Full Prefix <$> ifP (void $ char '*')
+    pure $ typ name
 
-nameListP :: Parser [Text]
+nameListP :: Parser [BranchName]
 nameListP = char '[' *> nameP `sepBy` (char ',') <* char ']'
 
 allowP :: Parser Branches

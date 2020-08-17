@@ -30,7 +30,7 @@ comments = decodeUtf8 $(embedFile "test/data/.cmt-comments")
 angularConfig :: Config
 angularConfig =
     Config
-        (Deny ["master"])
+        (Deny [Full "master"])
         [ Part "Type" (Options ["feat", "fix", "docs", "style", "refactor", "test", "chore"])
         , Part "Scope" Changed
         , Part "Short Message" Line
@@ -55,9 +55,15 @@ preWithVars = decodeUtf8 $(embedFile "test/data/.cmt-predefined-with-vars")
 preConfig :: PreDefinedParts
 preConfig =
     [ ( "vb"
-      , Config (Allow ["develop", "feature/*"]) [] [Literal "chore (package.yaml): version bump"])
+      , Config
+            (Allow [Full "develop", Prefix "feature/"])
+            []
+            [Literal "chore (package.yaml): version bump"])
     , ( "readme"
-      , Config (Allow ["develop", "feature/*"]) [] [Literal "docs (README.md): updated readme"])
+      , Config
+            (Allow [Full "develop", Prefix "feature/"])
+            []
+            [Literal "docs (README.md): updated readme"])
     ]
 
 preWithVarsConfig :: PreDefinedParts
