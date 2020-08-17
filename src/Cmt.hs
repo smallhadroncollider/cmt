@@ -31,10 +31,10 @@ helpText = decodeUtf8 $(embedFile "templates/usage.txt")
 backup :: FilePath
 backup = ".cmt.bkp"
 
-failure :: Text -> App
+failure :: Text -> App ()
 failure msg = errorMessage msg >> lift exitFailure
 
-dryRun :: Text -> App
+dryRun :: Text -> App ()
 dryRun txt = do
     header "Result"
     blank
@@ -44,7 +44,7 @@ dryRun txt = do
     mehssage "run: cmt --prev to commit"
     lift $ exitSuccess
 
-commitRun :: Text -> App
+commitRun :: Text -> App ()
 commitRun txt = do
     commited <- lift (commit $ stripEnd txt)
     case commited of
@@ -53,18 +53,18 @@ commitRun txt = do
             writeFile backup (encodeUtf8 txt)
             lift exitFailure
 
-send :: Text -> App
+send :: Text -> App ()
 send txt = do
     dry <- asks settingsDryRun
     bool commitRun dryRun dry txt
 
-display :: Either Text (Config, Outputs) -> App
+display :: Either Text (Config, Outputs) -> App ()
 display (Left err) = putStrLn err
 display (Right (cfg, output)) = do
     parts <- lift $ loop cfg
     send $ format cfg (output ++ parts)
 
-previous :: App
+previous :: App ()
 previous = do
     exists <- lift $ doesFileExist backup
     if exists
@@ -73,7 +73,7 @@ previous = do
                  send txt)
         else (failure "No previous commit attempts")
 
-predef :: Text -> Outputs -> App
+predef :: Text -> Outputs -> App ()
 predef name output = do
     cfg <- lift load
     case predefined =<< cfg of
@@ -83,14 +83,14 @@ predef name output = do
                 Nothing -> failure "No matching predefined message"
                 Just cf -> display $ checkFormat output cf
 
-configLocation :: App
+configLocation :: App ()
 configLocation = do
     file <- lift findFile
     case file of
         Just path -> putStrLn (pack path)
         Nothing   -> failure ".cmt file not found"
 
-next :: Next -> App
+next :: Next -> App ()
 next (Continue output)        = lift (readCfg output) >>= display
 next Previous                 = previous
 next (PreDefined name output) = predef name output

@@ -13,7 +13,7 @@ data Settings = Settings
     , settingsColourize :: Bool
     } deriving (Eq, Show)
 
-type App = ReaderT Settings IO ()
+type App a = ReaderT Settings IO a
 
 defaultSettings :: Settings
 defaultSettings = Settings {settingsDryRun = False, settingsColourize = True}
