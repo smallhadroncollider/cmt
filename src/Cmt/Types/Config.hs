@@ -5,6 +5,12 @@ module Cmt.Types.Config where
 import ClassyPrelude   (Eq, Maybe (..), Show, Text)
 import Data.Map.Strict (Map)
 
+data Branches
+    = Any
+    | Deny [Text]
+    | Allow [Text]
+    deriving (Show, Eq)
+
 type Output = (Name, Text)
 
 type Outputs = Map Name Text
@@ -33,7 +39,8 @@ data Part =
     deriving (Show, Eq)
 
 data Config =
-    Config [Part]
+    Config Branches
+           [Part]
            [FormatPart]
     deriving (Show, Eq)
 

@@ -19,7 +19,7 @@ basic :: Text
 basic = decodeUtf8 $(embedFile "test/data/.cmt")
 
 basicConfig :: Config
-basicConfig = Config [Part "Week" Line] [Named "Week", Literal ": ", Named "*", Literal "\n"]
+basicConfig = Config Any [Part "Week" Line] [Named "Week", Literal ": ", Named "*", Literal "\n"]
 
 angular :: Text
 angular = decodeUtf8 $(embedFile "test/data/.cmt-angular")
@@ -30,6 +30,7 @@ comments = decodeUtf8 $(embedFile "test/data/.cmt-comments")
 angularConfig :: Config
 angularConfig =
     Config
+        (Deny ["master"])
         [ Part "Type" (Options ["feat", "fix", "docs", "style", "refactor", "test", "chore"])
         , Part "Scope" Changed
         , Part "Short Message" Line
@@ -53,17 +54,23 @@ preWithVars = decodeUtf8 $(embedFile "test/data/.cmt-predefined-with-vars")
 
 preConfig :: PreDefinedParts
 preConfig =
-    [ ("vb", Config [] [Literal "chore (package.yaml): version bump"])
-    , ("readme", Config [] [Literal "docs (README.md): updated readme"])
+    [ ( "vb"
+      , Config (Allow ["develop", "feature/*"]) [] [Literal "chore (package.yaml): version bump"])
+    , ( "readme"
+      , Config (Allow ["develop", "feature/*"]) [] [Literal "docs (README.md): updated readme"])
     ]
 
 preWithVarsConfig :: PreDefinedParts
 preWithVarsConfig =
     [ ( "vb"
-      , Config [Part "Scope" Changed] [Literal "chore (", Named "Scope", Literal "): version bump"])
+      , Config
+            Any
+            [Part "Scope" Changed]
+            [Literal "chore (", Named "Scope", Literal "): version bump"])
     , ( "readme"
-      , Config [Part "Short Message" Line] [Literal "docs (README.md): ", Named "Short Message"])
-    , ("multiline", Config [] [Literal "This\nNow works # but comments are included\nI believe\n"])
+      , Config Any [Part "Short Message" Line] [Literal "docs (README.md): ", Named "Short Message"])
+    , ( "multiline"
+      , Config Any [] [Literal "This\nNow works # but comments are included\nI believe\n"])
     ]
 
 -- import Test.Tasty.HUnit

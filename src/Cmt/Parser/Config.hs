@@ -11,6 +11,7 @@ import ClassyPrelude
 
 import Data.Attoparsec.Text
 
+import Cmt.Parser.Config.Branches   (branchesP)
 import Cmt.Parser.Config.Format     (formatP)
 import Cmt.Parser.Config.Parts      (partsP)
 import Cmt.Parser.Config.PreDefined (predefinedPartsP)
@@ -18,16 +19,18 @@ import Cmt.Types.Config
 
 configP :: Parser Config
 configP = do
+    branches <- branchesP
     parts <- partsP
-    _ <- predefinedPartsP parts
+    _ <- predefinedPartsP branches parts
     format <- formatP $ partName <$> parts
     _ <- endOfInput
-    pure $ Config parts format
+    pure $ Config branches parts format
 
 predefinedP :: Parser PreDefinedParts
 predefinedP = do
+    branches <- branchesP
     parts <- partsP
-    pre <- predefinedPartsP parts
+    pre <- predefinedPartsP branches parts
     _ <- formatP $ partName <$> parts
     _ <- endOfInput
     pure pre

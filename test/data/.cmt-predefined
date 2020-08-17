@@ -2,6 +2,7 @@
 # Blah blah blah
 #
 # Blah blah blah
+[develop,feature/*]
 
 # Blah blah blah
 { # A comment

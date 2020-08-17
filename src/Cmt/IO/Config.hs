@@ -23,14 +23,14 @@ configFile :: FilePath
 configFile = ".cmt"
 
 checkFormat :: Outputs -> Config -> Either Text (Config, Outputs)
-checkFormat output (Config parts format) = do
+checkFormat output (Config branches parts format) = do
     let partNames = nub $ partName <$> parts
     let formatNames = nub . catMaybes $ formatName <$> format
     let result
             | isJust (find (== "*") formatNames) && null output = Left "Command line entry missing"
             | (length partNames + length output) /= length formatNames =
                 Left "Parts and format do not match"
-            | otherwise = Right (Config parts format, output)
+            | otherwise = Right (Config branches parts format, output)
     result
 
 parse :: Outputs -> Text -> Either Text (Config, Outputs)

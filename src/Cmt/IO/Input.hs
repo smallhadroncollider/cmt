@@ -80,4 +80,4 @@ output (Part name Lines)          = putName name >> (,) name <$> (unlines <$> mu
 output (Part name Changed)        = putName name >> (,) name <$> (options =<< changed)
 
 loop :: Config -> IO Outputs
-loop (Config parts _) = mapFromList <$> traverse output parts
+loop (Config _ parts _) = mapFromList <$> traverse output parts

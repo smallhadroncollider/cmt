@@ -15,25 +15,25 @@ import Cmt.Parser.Config.Format (formatP)
 import Cmt.Types.Config
 
 -- predefined
-value :: Name -> [Part] -> Parser Config
-value name parts = lexeme (char '"' *> takeTill (== '"') <* char '"') >>= getConfig
+value :: Name -> Branches -> [Part] -> Parser Config
+value name branches parts = lexeme (char '"' *> takeTill (== '"') <* char '"') >>= getConfig
   where
     getConfig :: Text -> Parser Config
     getConfig template =
         case parseOnly (formatP $ partName <$> parts) template of
             Left _    -> fail $ "Invalid predefined template: " ++ show name
-            Right fmt -> pure $ Config (filterParts fmt parts) fmt
+            Right fmt -> pure $ Config branches (filterParts fmt parts) fmt
     filterParts :: [FormatPart] -> [Part] -> [Part]
     filterParts fps = filter ((`elem` catMaybes (formatName <$> fps)) . partName)
 
-partP :: [Part] -> Parser PreDefinedPart
-partP ps =
+partP :: Branches -> [Part] -> Parser PreDefinedPart
+partP branches ps =
     stripComments $ do
         name <- pack <$> many' letter <* lexeme (char '=')
-        conf <- stripComments (value name ps)
+        conf <- stripComments (value name branches ps)
         pure (name, conf)
 
-predefinedPartsP :: [Part] -> Parser PreDefinedParts
-predefinedPartsP ps =
+predefinedPartsP :: Branches -> [Part] -> Parser PreDefinedParts
+predefinedPartsP branches ps =
     mapFromList <$>
-    option [] (stripComments (char '{') *> many' (partP ps) <* stripComments (char '}'))
+    option [] (stripComments (char '{') *> many' (partP branches ps) <* stripComments (char '}'))
