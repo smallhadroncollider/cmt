@@ -8,7 +8,6 @@ module Cmt.IO.Input
 
 import ClassyPrelude
 
-import Data.Map.Strict              (Map)
 import System.Console.Terminal.Size (size, width)
 
 import Cmt.IO.Git         (changed)

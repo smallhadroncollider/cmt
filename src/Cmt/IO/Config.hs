@@ -13,7 +13,7 @@ import ClassyPrelude
 
 import Data.List        (nub)
 import System.Directory (doesFileExist, getCurrentDirectory, getHomeDirectory)
-import System.FilePath  (takeDirectory, (</>))
+import System.FilePath  (takeDirectory)
 
 import Cmt.Parser.Config (config)
 import Cmt.Types.Config
