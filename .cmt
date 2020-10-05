@@ -14,8 +14,9 @@
 
 # predefined messages
 {
+    r = "chore: updates Stack resolver"
     vb = "chore: version bump"
-    readme = "docs: updated readme"
+    readme = "docs: updates readme"
 }
 
 # output format
